@@ -12,16 +12,25 @@ import {
   Easing,
   StyleSheet,
   Alert,
-  TextInput, // <-- IMPORTAR TextInput
+  TextInput,
+  SafeAreaView, // Adicionado para melhor manuseio de áreas seguras
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from '../../context/AuthContext';
-import axios from 'axios'; // <-- IMPORTAR axios
+import axios from 'axios';
 
-// Seus dados e imagens locais
-const localImages = { remedio: require("../../assets/copo.png"), /* ... */ };
-const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" }, /* ... */ ];
+
+const localImages = {
+  remedio: require("../../assets/agua.png"),
+};
+
+const data = [
+  { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" },
+  { id: "2", title: "Batimento", img: localImages.remedio, screen: "OutraTela" }, // Exemplo
+  { id: "3", title: "Sangue", img: localImages.remedio, screen: "MaisUmaTela" }, // Exemplo
+  { id: "4", title: "Glicose", img: localImages.remedio, screen: "TesteTela" }, // Exemplo
+];
 
 export default function Home() {
   const navigation = useNavigation();
@@ -32,22 +41,40 @@ export default function Home() {
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false); // Pode ser gerenciado por um contexto ou preferência do usuário
   const animationValues = useRef(data.map(() => new Animated.Value(0))).current;
+
+  // --- CORES (Paleta mais coesa) ---
+  const colors = {
+    primary: '#4CAF50', // Verde vibrante
+    primaryDark: '#388E3C',
+    accent: '#FFC107', // Amarelo para destaque
+    backgroundLight: '#F5F5F5',
+    backgroundDark: '#212121',
+    textLight: '#212121',
+    textDark: '#E0E0E0',
+    cardBackgroundLight: '#FFFFFF',
+    cardBackgroundDark: '#424242',
+    modalBackgroundLight: 'rgba(0,0,0,0.4)',
+    modalBackgroundDark: 'rgba(0,0,0,0.6)',
+    danger: '#D32F2F',
+    warning: '#FFA000',
+    divider: '#BDBDBD',
+  };
 
   // --- EFFECTS ---
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={() => setProfileModalVisible(true)} style={{ marginRight: 15 }}>
-          <Ionicons name="person-circle-outline" size={32} color={darkMode ? "#fff" : "#000"} />
+          <Ionicons name="person-circle-outline" size={32} color={darkMode ? colors.textDark : colors.textLight} />
         </TouchableOpacity>
       ),
-      headerTitle: `Bem-vindo, ${user?.nome}`,
-      headerTitleStyle: { color: darkMode ? '#fff' : '#000' },
-      headerStyle: { backgroundColor: darkMode ? '#1E1E1E' : '#f0f8ff' }
+      headerTitle: `Bem-vindo, ${user?.nome || 'Usuário'}`,
+      headerTitleStyle: { color: darkMode ? colors.textDark : colors.textLight, fontSize: 20, fontWeight: 'bold' },
+      headerStyle: { backgroundColor: darkMode ? colors.backgroundDark : colors.backgroundLight, elevation: 0, shadowOpacity: 0 }
     });
-  }, [navigation, darkMode, user]);
+  }, [navigation, darkMode, user, colors]);
 
   useEffect(() => {
     const animations = data.map((_, index) =>
@@ -60,7 +87,7 @@ export default function Home() {
       })
     );
     Animated.stagger(100, animations).start();
-  }, []);
+  }, [animationValues]);
 
   // --- FUNÇÕES HANDLER ---
 
@@ -80,7 +107,7 @@ export default function Home() {
   };
 
   const confirmDeleteAccount = async () => {
-    if (deleteConfirmationText !== 'DELETAR') {
+    if (deleteConfirmationText.toUpperCase() !== 'DELETAR') {
       Alert.alert('Confirmação Incorreta', 'Você deve digitar "DELETAR" para confirmar.');
       return;
     }
@@ -88,7 +115,7 @@ export default function Home() {
     const apiUrl = `http://127.0.0.1:8000/api/usuarios/${user.id}`; // Lembre-se de usar seu IP
 
     try {
-      await axios.delete(apiUrl );
+      await axios.delete(apiUrl);
       Alert.alert('Conta Deletada', 'Sua conta foi permanentemente deletada.');
       setDeleteModalVisible(false);
       logout();
@@ -101,26 +128,31 @@ export default function Home() {
   // --- RENDERIZAÇÃO ---
 
   const renderItem = ({ item, index }) => {
-    const translateY = animationValues[index].interpolate({ inputRange: [0, 1], outputRange: [30, 0] });
+    const translateY = animationValues[index].interpolate({ inputRange: [0, 1], outputRange: [50, 0] });
     const opacity = animationValues[index];
     return (
       <Animated.View style={{ transform: [{ translateY }], opacity, flex: 1 }}>
-        <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => navigation.navigate(item.screen)}>
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: darkMode ? colors.cardBackgroundDark : colors.cardBackgroundLight }]} 
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate(item.screen)}
+        >
           <Image source={item.img} style={styles.cardImg} />
-          <Text style={styles.cardText}>{item.title}</Text>
+          <Text style={[styles.cardText, { color: darkMode ? colors.textDark : colors.textLight }]}>{item.title}</Text>
         </TouchableOpacity>
       </Animated.View>
     );
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: darkMode ? "#1E1E1E" : "#f0f8ff" }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: darkMode ? colors.backgroundDark : colors.backgroundLight }]}>
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}
         contentContainerStyle={styles.grid}
+        columnWrapperStyle={styles.row}
       />
 
       {/* Modal de Perfil */}
@@ -130,20 +162,20 @@ export default function Home() {
         visible={profileModalVisible}
         onRequestClose={() => setProfileModalVisible(false)}
       >
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setProfileModalVisible(false)}>
-          <View style={styles.modalView}>
+        <TouchableOpacity style={[styles.modalOverlay, { backgroundColor: darkMode ? colors.modalBackgroundDark : colors.modalBackgroundLight }]} activeOpacity={1} onPressOut={() => setProfileModalVisible(false)}>
+          <View style={[styles.modalView, { backgroundColor: darkMode ? colors.cardBackgroundDark : colors.cardBackgroundLight }]}>
             <TouchableOpacity style={styles.modalButton} onPress={handleEditProfile}>
-              <Ionicons name="create-outline" size={22} color="#333" />
-              <Text style={styles.modalButtonText}>Editar Perfil</Text>
+              <Ionicons name="create-outline" size={22} color={darkMode ? colors.textDark : colors.textLight} />
+              <Text style={[styles.modalButtonText, { color: darkMode ? colors.textDark : colors.textLight }]}>Editar Perfil</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalButton} onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={22} color="#e74c3c" />
-              <Text style={[styles.modalButtonText, { color: '#e74c3c' }]}>Sair</Text>
+              <Ionicons name="log-out-outline" size={22} color={colors.danger} />
+              <Text style={[styles.modalButtonText, { color: colors.danger }]}>Sair</Text>
             </TouchableOpacity>
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: darkMode ? colors.divider : colors.divider }]} />
             <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
-              <Ionicons name="trash-outline" size={22} color="#800000" />
-              <Text style={[styles.modalButtonText, { color: '#800000' }]}>Deletar Conta</Text>
+              <Ionicons name="trash-outline" size={22} color={colors.danger} />
+              <Text style={[styles.modalButtonText, { color: colors.danger }]}>Deletar Conta</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -156,16 +188,16 @@ export default function Home() {
         visible={confirmLogoutVisible}
         onRequestClose={() => setConfirmLogoutVisible(false)}
       >
-        <View style={styles.confirmModalOverlay}>
-          <View style={styles.confirmModalView}>
-            <Text style={styles.confirmModalTitle}>Confirmar Saída</Text>
-            <Text style={styles.confirmModalText}>Você tem certeza que deseja se desconectar?</Text>
+        <View style={[styles.confirmModalOverlay, { backgroundColor: darkMode ? colors.modalBackgroundDark : colors.modalBackgroundLight }]}>
+          <View style={[styles.confirmModalView, { backgroundColor: darkMode ? colors.cardBackgroundDark : colors.cardBackgroundLight }]}>
+            <Text style={[styles.confirmModalTitle, { color: darkMode ? colors.textDark : colors.textLight }]}>Confirmar Saída</Text>
+            <Text style={[styles.confirmModalText, { color: darkMode ? colors.textDark : colors.textLight }]}>Você tem certeza que deseja se desconectar?</Text>
             <View style={styles.confirmModalButtonContainer}>
               <TouchableOpacity style={[styles.confirmModalButton, styles.cancelButton]} onPress={() => setConfirmLogoutVisible(false)}>
                 <Text style={[styles.confirmModalButtonText, styles.cancelButtonText]}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.confirmModalButton, styles.logoutButton]} onPress={() => { setConfirmLogoutVisible(false); logout(); }}>
-                <Text style={[styles.confirmModalButtonText, styles.logoutButtonText]}>Sim, Sair</Text>
+              <TouchableOpacity style={[styles.confirmModalButton, styles.logoutButton, { backgroundColor: colors.danger }]} onPress={() => { setConfirmLogoutVisible(false); logout(); }}>
+                <Text style={[styles.confirmModalButtonText, styles.logoutButtonText]}>Sair</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -179,14 +211,15 @@ export default function Home() {
         visible={deleteModalVisible}
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={styles.confirmModalOverlay}>
-          <View style={styles.confirmModalView}>
-            <Ionicons name="warning" size={40} color="#d9534f" />
-            <Text style={styles.confirmModalTitle}>Ação Irreversível!</Text>
-            <Text style={styles.confirmModalText}>Para confirmar, digite <Text style={{fontWeight: 'bold'}}>DELETAR</Text> no campo abaixo.</Text>
+        <View style={[styles.confirmModalOverlay, { backgroundColor: darkMode ? colors.modalBackgroundDark : colors.modalBackgroundLight }]}>
+          <View style={[styles.confirmModalView, { backgroundColor: darkMode ? colors.cardBackgroundDark : colors.cardBackgroundLight }]}>
+            <Ionicons name="warning" size={40} color={colors.warning} />
+            <Text style={[styles.confirmModalTitle, { color: darkMode ? colors.textDark : colors.textLight }]}>Ação Irreversível!</Text>
+            <Text style={[styles.confirmModalText, { color: darkMode ? colors.textDark : colors.textLight }]}>Para confirmar, digite <Text style={{fontWeight: 'bold'}}>DELETAR</Text> no campo abaixo.</Text>
             <TextInput
-              style={styles.deleteInput}
+              style={[styles.deleteInput, { borderColor: darkMode ? colors.divider : '#ccc', color: darkMode ? colors.textDark : colors.textLight, backgroundColor: darkMode ? colors.backgroundDark : '#fff' }]} 
               placeholder="DELETAR"
+              placeholderTextColor={darkMode ? colors.textDark : '#999'}
               value={deleteConfirmationText}
               onChangeText={setDeleteConfirmationText}
               autoCapitalize="characters"
@@ -196,170 +229,147 @@ export default function Home() {
                 <Text style={[styles.confirmModalButtonText, styles.cancelButtonText]}>Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.confirmModalButton, styles.deleteConfirmButton, deleteConfirmationText !== 'DELETAR' && styles.buttonDisabled]}
+                style={[
+                  styles.confirmModalButton,
+                  styles.deleteConfirmButton,
+                  { backgroundColor: colors.danger },
+                  deleteConfirmationText.toUpperCase() !== 'DELETAR' && styles.buttonDisabled
+                ]}
                 onPress={confirmDeleteAccount}
-                disabled={deleteConfirmationText !== 'DELETAR'}
+                disabled={deleteConfirmationText.toUpperCase() !== 'DELETAR'}
               >
-                <Text style={[styles.confirmModalButtonText, styles.logoutButtonText]}>Confirmar Exclusão</Text>
+                <Text style={[styles.confirmModalButtonText, styles.logoutButtonText]}>Excluir Conta</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
-// Estilos (certifique-se de que todos os estilos que definimos antes estão aqui)
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f8ff',
   },
+  grid: {
+    padding: 10,
+  },
+  row: {
+    justifyContent: 'space-around', // Distribui os itens uniformemente
+  },
+  card: {
+    flex: 1,
+    margin: 8, // Espaçamento reduzido para melhor visualização em grid
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 }, // Sombra mais pronunciada
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  cardImg: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+    resizeMode: 'contain', // Garante que a imagem se ajuste sem cortar
+  },
+  cardText: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  // Estilos do Modal de Perfil
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    width: '100%',
+  },
+  modalButtonText: {
+    marginLeft: 15,
+    fontSize: 17,
+  },
+  divider: {
+    height: 1,
+    width: '100%',
+    marginVertical: 8,
+  },
+  // Estilos dos Modais de Confirmação (Logout e Deleção)
   confirmModalOverlay: {
     flex: 1,
-    justifyContent: 'center', // Centraliza verticalmente
-    alignItems: 'center',     // Centraliza horizontalmente
-    backgroundColor: 'rgba(0,0,0,0.5)', // Fundo mais escuro
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   confirmModalView: {
     width: '85%',
-    maxWidth: 320,
-    backgroundColor: "white",
+    maxWidth: 350, // Aumentado ligeiramente
     borderRadius: 20,
     padding: 25,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowRadius: 8,
+    elevation: 10,
   },
   confirmModalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
   },
   confirmModalText: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 25,
+    lineHeight: 24, // Melhorar legibilidade
   },
   confirmModalButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 10,
   },
   confirmModalButton: {
-    flex: 1, // Faz os botões dividirem o espaço
-    padding: 12,
+    flex: 1,
+    padding: 14,
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: 5, // Espaçamento entre os botões
+    marginHorizontal: 5,
   },
   confirmModalButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
   cancelButton: {
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#E0E0E0',
   },
   cancelButtonText: {
-    color: '#333',
+    color: '#424242',
   },
   logoutButton: {
-    backgroundColor: '#e74c3c',
+    // Cor definida inline para o danger color
   },
   logoutButtonText: {
     color: 'white',
   },
-  grid: {
-    padding: 10,
-  },
-  card: {
-    flex: 1,
-    margin: 10,
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  cardImg: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
-  },
-  cardText: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.2)',
-  },
-  modalView: {
-    marginRight: 10,
-    marginTop: 60,
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    alignItems: "flex-start",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: 200,
-  },
-  modalButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    width: '100%',
-  },
-  modalButtonText: {
-    marginLeft: 15,
-    fontSize: 18,
-    color: '#333',
-  },
-divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 5,
-  },
-  deleteInput: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    padding: 10,
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    marginTop: 10,
-    color: '#333',
-  },
+
   deleteConfirmButton: {
-    backgroundColor: '#d9534f',
+    // Cor definida inline para o danger color
   },
   buttonDisabled: {
-    backgroundColor: '#aaa',
+    opacity: 0.6,
   },
 });
+

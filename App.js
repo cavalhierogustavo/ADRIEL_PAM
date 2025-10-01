@@ -59,7 +59,8 @@ const AppNavigator = () => {
             headerRight: () => <LogoutButton />
           }}
         />
-          <Stack.Screen name="Aguinha" component={aguinha} />
+          <Stack.Screen name="Aguinha" component={aguinha} 
+          options={{ headerShown: false }} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
         </>
       ) : (
