@@ -12,8 +12,8 @@ import styles from './style';
 const { width, height } = Dimensions.get('window');
 const recipientes = [
   { id: "copoPequeno", amount: 150, img: require("../../assets/copo.png") },
-  { id: "copoMedio", amount: 250, img: require("../../assets/garafa.png") },
-  { id: "garrafa", amount: 500, img: require("../../assets/galao.png") },
+  { id: "copoMedio", amount: 250, img: require("../../assets/copo.png") },
+  { id: "garrafa", amount: 500, img: require("../../assets/copo.png") },
 ];
 
 const AnimatedWaterFill = ({ progress }) => {

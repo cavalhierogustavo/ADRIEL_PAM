@@ -1,21 +1,21 @@
 import React, { useState, useRef } from 'react';
 import {
   Text,
-  SafeAreaView,
   StyleSheet,
   View,
   TextInput,
   TouchableOpacity,
   ScrollView,
-  Platform,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import axios from 'axios';
 import { Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function cadastro({ navigation }) {
+export default function CadastroScreen({ navigation }) {
   // --- Estados do formulário ---
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -31,7 +31,7 @@ export default function cadastro({ navigation }) {
 
   // --- Estados de controle da UI ---
   const [isLoadingCep, setIsLoadingCep] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // NOVO ESTADO
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const numeroInputRef = useRef(null);
 
@@ -75,14 +75,12 @@ export default function cadastro({ navigation }) {
     }
   };
 
-   const escolherFoto = async () => {
-
+  const escolherFoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar sua galeria de fotos.');
       return;
     }
-
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -92,25 +90,21 @@ export default function cadastro({ navigation }) {
     });
 
     if (!result.canceled) {
-
-      setFoto(result.assets[0]); 
+      setFoto(result.assets[0]);
     }
   };
 
   const handleCadastro = async () => {
-    // IMPORTANTE: Use o IP da sua máquina, não 127.0.0.1, para testar no celular.
-    // Ex: 'http://192.168.1.5:8000/api/cadastro'
-    const apiUrl = 'http://127.0.0.1:8000/api/cadastro'; 
+    const apiUrl = 'http://127.0.0.1:8000/api/cadastro';
 
-    if (!nome || !email || !senha ) {
+    if (!nome || !email || !senha) {
       Alert.alert('Erro', 'Por favor, preencha os campos obrigatórios: Nome, E-mail e Senha.');
       return;
     }
-    
+
     setIsSubmitting(true);
     const formData = new FormData();
 
-    // Adiciona os campos de texto (sem alterações aqui)
     formData.append('nome', nome);
     formData.append('email', email);
     formData.append('senha', senha);
@@ -122,19 +116,12 @@ export default function cadastro({ navigation }) {
     formData.append('cidade', cidade);
     formData.append('uf', uf);
 
-    // ===== CORREÇÃO PRINCIPAL AQUI =====
     if (foto) {
       try {
-        // Converte a imagem para um Blob, que funciona bem na web e nativo
         const response = await fetch(foto.uri);
         const blob = await response.blob();
-        
-        // Extrai o nome do arquivo da URI
         const filename = foto.uri.split('/').pop();
-
-        // Anexa o blob ao FormData
         formData.append('foto', blob, filename);
-
       } catch (e) {
         console.error("Erro ao processar a imagem: ", e);
         Alert.alert("Erro", "Não foi possível processar a imagem para upload.");
@@ -146,8 +133,6 @@ export default function cadastro({ navigation }) {
     try {
       const response = await axios.post(apiUrl, formData, {
         headers: {
-          // Para FormData, o axios geralmente define o header correto automaticamente.
-          // Mas podemos deixar 'multipart/form-data' para garantir.
           'Content-Type': 'multipart/form-data',
         },
       });
@@ -162,223 +147,313 @@ export default function cadastro({ navigation }) {
       let errorMessage = 'Não foi possível completar o cadastro. Tente novamente.';
       if (error.response && error.response.data) {
         const errors = error.response.data.errors || error.response.data;
-        // Transforma o objeto de erros em uma string legível
         errorMessage = Object.keys(errors).map(key => errors[key][0]).join('\n');
       }
       Alert.alert('Erro no Cadastro', errorMessage);
     } finally {
       setIsSubmitting(false);
     }
-};
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-  <ScrollView contentContainerStyle={styles.scrollView}>
-    {/* O ScrollView agora tem apenas UM filho direto: a View do card */}
-    <View style={styles.card}> 
-      <Text style={styles.title}>Crie sua Conta</Text>
-      <Text style={styles.subtitle}>Comece a cuidar da sua saúde hoje mesmo.</Text>
+    <KeyboardAvoidingView
+      style={styles.keyboardAvoidingContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={styles.backgroundContainer}>
+        <View style={styles.overlay} />
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Crie sua Conta</Text>
+            <Text style={styles.subtitle}>Sua jornada de saúde começa aqui.</Text>
 
-      {/* Bloco de seleção de imagem */}
-      <View style={styles.imagePickerContainer}>
-        <TouchableOpacity onPress={escolherFoto}>
-          {foto ? (
-            <Image source={{ uri: foto.uri }} style={styles.profileImage} />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Text style={styles.imagePlaceholderText}>Escolher Foto</Text>
+            {/* Bloco de seleção de imagem */}
+            <View style={styles.imagePickerContainer}>
+              <TouchableOpacity onPress={escolherFoto}>
+                {foto ? (
+                  <Image source={{ uri: foto.uri }} style={styles.profileImage} />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <Text style={styles.imagePlaceholderText}>📷 Escolher Foto</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             </View>
-          )}
-        </TouchableOpacity>
+
+            {/* Inputs de texto */}
+            <TextInput
+              style={styles.input}
+              placeholder="Nome Completo"
+              value={nome}
+              onChangeText={setNome}
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Data de Nascimento (DD/MM/AAAA)"
+              value={dataNascimento}
+              onChangeText={setDataNascimento}
+              keyboardType="numeric"
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <View style={styles.divider} />
+
+            {/* Endereço */}
+            <View style={styles.cepContainer}>
+              <TextInput
+                style={styles.cepInput}
+                placeholder="CEP"
+                value={cep}
+                onChangeText={setCep}
+                keyboardType="numeric"
+                maxLength={8}
+                onBlur={buscarEnderecoPorCep}
+                placeholderTextColor="#BBDEFB"
+              />
+              {isLoadingCep && <ActivityIndicator size="small" color="#FFFFFF" style={styles.cepLoader} />}
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Logradouro"
+              value={logradouro}
+              onChangeText={setLogradouro}
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              ref={numeroInputRef}
+              style={styles.input}
+              placeholder="Número"
+              value={numero}
+              onChangeText={setNumero}
+              keyboardType="numeric"
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Bairro"
+              value={bairro}
+              onChangeText={setBairro}
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Cidade"
+              value={cidade}
+              onChangeText={setCidade}
+              placeholderTextColor="#BBDEFB"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Estado (UF)"
+              value={uf}
+              onChangeText={setUf}
+              maxLength={2}
+              autoCapitalize="characters"
+              placeholderTextColor="#BBDEFB"
+            />
+
+            {/* Botão de Cadastrar */}
+            {isSubmitting ? (
+              <ActivityIndicator size="large" color="#FFFFFF" style={styles.activityIndicator} />
+            ) : (
+              <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+                <Text style={styles.buttonText}>Cadastrar</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.loginLinkContainer}
+              onPress={() => navigation.navigate('Login')}
+            >
+              <Text style={styles.loginLinkText}>
+                Já tem uma conta? <Text style={styles.loginLinkTextBold}>Faça login</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
-
-      {/* Inputs de texto */}
-      <Text style={styles.label}>Nome Completo</Text>
-      <TextInput style={styles.input} placeholder="Digite seu nome completo" value={nome} onChangeText={setNome} placeholderTextColor="#999" />
-      
-      <Text style={styles.label}>E-mail</Text>
-      <TextInput style={styles.input} placeholder="exemplo@email.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholderTextColor="#999"/>
-
-      <Text style={styles.label}>Data de Nascimento</Text>
-      <TextInput style={styles.input} placeholder="DD/MM/AAAA" value={dataNascimento} onChangeText={setDataNascimento} keyboardType="numeric" placeholderTextColor="#999"/>
-
-      <Text style={styles.label}>Senha</Text>
-      <TextInput style={styles.input} placeholder="Crie uma senha forte" value={senha} onChangeText={setSenha} secureTextEntry placeholderTextColor="#999"/>
-      
-      <View style={styles.divider} />
-
-      {/* Endereço */}
-      <Text style={styles.label}>CEP</Text>
-      <View style={styles.cepContainer}>
-        <TextInput style={styles.cepInput} placeholder="Digite seu CEP" value={cep} onChangeText={setCep} keyboardType="numeric" maxLength={8} onBlur={buscarEnderecoPorCep} placeholderTextColor="#999"/>
-        {isLoadingCep && <ActivityIndicator size="small" color="#2A72E6" />}
-      </View>
-
-      <Text style={styles.label}>Logradouro</Text>
-      <TextInput style={styles.input} placeholder="Rua, Avenida..." value={logradouro} onChangeText={setLogradouro} placeholderTextColor="#999"/>
-
-      <Text style={styles.label}>Número</Text>
-      <TextInput ref={numeroInputRef} style={styles.input} placeholder="Digite o número" value={numero} onChangeText={setNumero} keyboardType="numeric" placeholderTextColor="#999"/>
-
-      <Text style={styles.label}>Bairro</Text>
-      <TextInput style={styles.input} placeholder="Seu bairro" value={bairro} onChangeText={setBairro} placeholderTextColor="#999"/>
-
-      <Text style={styles.label}>Cidade</Text>
-      <TextInput style={styles.input} placeholder="Sua cidade" value={cidade} onChangeText={setCidade} placeholderTextColor="#999"/>
-      
-      <Text style={styles.label}>Estado (UF)</Text>
-      <TextInput style={styles.input} placeholder="Seu estado" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" placeholderTextColor="#999"/>
-
-      {/* Botão de Cadastrar */}
-      <TouchableOpacity 
-        style={[styles.button, isSubmitting && styles.buttonDisabled]} 
-        onPress={handleCadastro} 
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
-        ) : (
-          <Text style={styles.buttonText}>Cadastrar</Text>
-        )}
-      </TouchableOpacity>
-      
-      {/* ===== CORREÇÃO AQUI ===== */}
-      {/* O link de login foi movido para DENTRO do card */}
-      <TouchableOpacity style={styles.loginLinkContainer} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.loginLinkText}>
-          Já tem uma conta? <Text style={styles.loginLinkTextBold}>Faça login</Text>
-        </Text>
-      </TouchableOpacity>
-      
-    </View> {/* Fim do <View style={styles.card}> */}
-  </ScrollView>
-</SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
+  keyboardAvoidingContainer: {
     flex: 1,
-    backgroundColor: '#F0F4F8',
   },
-  scrollView: {
+  backgroundContainer: {
+    flex: 1,
+    backgroundColor: '#9fccffff', // Mesmo azul vibrante da tela de login
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.1)', // Overlay sutil
+  },
+  scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
+    paddingVertical: 30,
   },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1A2E44',
-    textAlign: 'center',
+    fontSize: 38,
+    fontWeight: '800',
+    color: '#FFFFFF',
     marginBottom: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#5A6A7D',
+    fontSize: 19,
+    color: '#E3F2FD',
+    marginBottom: 30,
     textAlign: 'center',
-    marginBottom: 25,
-  },
-  label: {
-    fontSize: 14,
-    color: '#1A2E44',
-    marginBottom: 8,
-    marginTop: 12,
-    fontWeight: '500',
-  },
-  input: {
-    backgroundColor: '#F7F8FA',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    height: 48,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E0E7EE',
-    color: '#1A2E44',
-  },
-  cepContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F7F8FA',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E0E7EE',
-  },
-  cepInput: {
-    flex: 1,
-    height: 48,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#1A2E44',
-  },
-  button: {
-    backgroundColor: '#2A72E6',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 25,
-  },
-  buttonDisabled: {
-    backgroundColor: '#A9C4F5',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E0E7EE',
-    marginVertical: 20,
-  },
-  loginLinkContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  loginLinkText: {
-      fontSize: 14,
-      color: '#5A6A7D',
-  },
-  loginLinkTextBold: {
-      fontWeight: 'bold',
-      color: '#2A72E6',
   },
   imagePickerContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 25,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#2A72E6',
+    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   imagePlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#E0E7EE',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#A9C4F5',
+    borderColor: '#FFFFFF',
     borderStyle: 'dashed',
   },
   imagePlaceholderText: {
-    color: '#5A6A7D',
+    color: '#FFFFFF',
     textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  input: {
+    width: '100%',
+    height: 58,
+    borderColor: '#90CAF9',
+    borderWidth: 1,
+    borderRadius: 15,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    fontSize: 17,
+    color: '#333333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  cepContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 58,
+    borderColor: '#90CAF9',
+    borderWidth: 1,
+    borderRadius: 15,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  cepInput: {
+    flex: 1,
+    fontSize: 17,
+    color: '#333333',
+  },
+  cepLoader: {
+    marginLeft: 10,
+  },
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    marginVertical: 15,
+  },
+  button: {
+    width: '100%',
+    height: 60,
+    backgroundColor: '#1976D2',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  activityIndicator: {
+    marginTop: 30,
+  },
+  loginLinkContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+  loginLinkText: {
+    fontSize: 17,
+    color: '#E3F2FD',
+  },
+  loginLinkTextBold: {
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textDecorationLine: 'underline',
   },
 });
-
