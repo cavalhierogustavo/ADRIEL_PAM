@@ -16,7 +16,7 @@ import { Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function cadastro({ navigation }) {
-  // --- Estados do formulário ---
+  
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -31,7 +31,7 @@ export default function cadastro({ navigation }) {
 
   // --- Estados de controle da UI ---
   const [isLoadingCep, setIsLoadingCep] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // NOVO ESTADO
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   const numeroInputRef = useRef(null);
 
@@ -98,8 +98,7 @@ export default function cadastro({ navigation }) {
   };
 
   const handleCadastro = async () => {
-    // IMPORTANTE: Use o IP da sua máquina, não 127.0.0.1, para testar no celular.
-    // Ex: 'http://192.168.1.5:8000/api/cadastro'
+
     const apiUrl = 'http://127.0.0.1:8000/api/cadastro'; 
 
     if (!nome || !email || !senha ) {
@@ -110,7 +109,6 @@ export default function cadastro({ navigation }) {
     setIsSubmitting(true);
     const formData = new FormData();
 
-    // Adiciona os campos de texto (sem alterações aqui)
     formData.append('nome', nome);
     formData.append('email', email);
     formData.append('senha', senha);
@@ -122,17 +120,17 @@ export default function cadastro({ navigation }) {
     formData.append('cidade', cidade);
     formData.append('uf', uf);
 
-    // ===== CORREÇÃO PRINCIPAL AQUI =====
+
     if (foto) {
       try {
-        // Converte a imagem para um Blob, que funciona bem na web e nativo
+        
         const response = await fetch(foto.uri);
         const blob = await response.blob();
         
-        // Extrai o nome do arquivo da URI
+        
         const filename = foto.uri.split('/').pop();
 
-        // Anexa o blob ao FormData
+        
         formData.append('foto', blob, filename);
 
       } catch (e) {
@@ -146,8 +144,7 @@ export default function cadastro({ navigation }) {
     try {
       const response = await axios.post(apiUrl, formData, {
         headers: {
-          // Para FormData, o axios geralmente define o header correto automaticamente.
-          // Mas podemos deixar 'multipart/form-data' para garantir.
+
           'Content-Type': 'multipart/form-data',
         },
       });
@@ -162,7 +159,7 @@ export default function cadastro({ navigation }) {
       let errorMessage = 'Não foi possível completar o cadastro. Tente novamente.';
       if (error.response && error.response.data) {
         const errors = error.response.data.errors || error.response.data;
-        // Transforma o objeto de erros em uma string legível
+        
         errorMessage = Object.keys(errors).map(key => errors[key][0]).join('\n');
       }
       Alert.alert('Erro no Cadastro', errorMessage);
@@ -174,12 +171,12 @@ export default function cadastro({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
   <ScrollView contentContainerStyle={styles.scrollView}>
-    {/* O ScrollView agora tem apenas UM filho direto: a View do card */}
+    
     <View style={styles.card}> 
       <Text style={styles.title}>Crie sua Conta</Text>
       <Text style={styles.subtitle}>Comece a cuidar da sua saúde hoje mesmo.</Text>
 
-      {/* Bloco de seleção de imagem */}
+      
       <View style={styles.imagePickerContainer}>
         <TouchableOpacity onPress={escolherFoto}>
           {foto ? (
@@ -192,7 +189,7 @@ export default function cadastro({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Inputs de texto */}
+      
       <Text style={styles.label}>Nome Completo</Text>
       <TextInput style={styles.input} placeholder="Digite seu nome completo" value={nome} onChangeText={setNome} placeholderTextColor="#999" />
       
@@ -207,7 +204,7 @@ export default function cadastro({ navigation }) {
       
       <View style={styles.divider} />
 
-      {/* Endereço */}
+      
       <Text style={styles.label}>CEP</Text>
       <View style={styles.cepContainer}>
         <TextInput style={styles.cepInput} placeholder="Digite seu CEP" value={cep} onChangeText={setCep} keyboardType="numeric" maxLength={8} onBlur={buscarEnderecoPorCep} placeholderTextColor="#999"/>
@@ -229,7 +226,7 @@ export default function cadastro({ navigation }) {
       <Text style={styles.label}>Estado (UF)</Text>
       <TextInput style={styles.input} placeholder="Seu estado" value={uf} onChangeText={setUf} maxLength={2} autoCapitalize="characters" placeholderTextColor="#999"/>
 
-      {/* Botão de Cadastrar */}
+      
       <TouchableOpacity 
         style={[styles.button, isSubmitting && styles.buttonDisabled]} 
         onPress={handleCadastro} 
@@ -242,15 +239,14 @@ export default function cadastro({ navigation }) {
         )}
       </TouchableOpacity>
       
-      {/* ===== CORREÇÃO AQUI ===== */}
-      {/* O link de login foi movido para DENTRO do card */}
+
       <TouchableOpacity style={styles.loginLinkContainer} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.loginLinkText}>
           Já tem uma conta? <Text style={styles.loginLinkTextBold}>Faça login</Text>
         </Text>
       </TouchableOpacity>
       
-    </View> {/* Fim do <View style={styles.card}> */}
+    </View>
   </ScrollView>
 </SafeAreaView>
   );

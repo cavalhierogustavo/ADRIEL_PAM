@@ -1,291 +1,671 @@
- import React, { useState, useEffect } from 'react';
-import {Text,View,SafeAreaView,TouchableOpacity,Dimensions,StatusBar,Modal,TextInput,Keyboard,ScrollView,Image,FlatList,Alert,} from 'react-native';
-import Animated, {useSharedValue, useAnimatedStyle,withTiming,}
-from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from "@react-navigation/native";
-import { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+  import React, { useState, useEffect, useContext } from 'react';
+  import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Alert, Modal, ScrollView } from 'react-native';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
+  import { AuthContext } from '../../context/AuthContext'; 
 
-import styles from './style';
+  const { width, height } = Dimensions.get('window');
 
-const { width, height } = Dimensions.get('window');
-const recipientes = [
-  { id: "copoPequeno", amount: 150, img: require("../../assets/copo.png") },
-  { id: "copoMedio", amount: 250, img: require("../../assets/garafa.png") },
-  { id: "garrafa", amount: 500, img: require("../../assets/galao.png") },
-];
+  function Aguinha() {
+    const { user } = useContext(AuthContext); 
 
-const AnimatedWaterFill = ({ progress }) => {
-  const fillHeight = useSharedValue(0);
-  useEffect(() => {
-    fillHeight.value = withTiming(progress * height, { duration: 1000 });
-  }, [progress]);
-  const animatedFillStyle = useAnimatedStyle(() => ({ height: fillHeight.value }));
-  return (
-    <Animated.View style={[styles.waterFillContainer, animatedFillStyle]}>
-      <View style={styles.waterFillTop} />
-    </Animated.View>
-  );
-};
-export default function WaterTrackerApp() {
-  const navigation = useNavigation();
-  const [telaAtiva, setTelaAtiva] = useState('hoje');
-  const [consumido, setConsumido] = useState(0);
-  const [meta, setMeta] = useState(0);
-  const [peso, setPeso] = useState('');
-  const [altura, setAltura] = useState('');
-  const [modalVisivel, setModalVisivel] = useState(true);
-  const [historicoConsumo, setHistoricoConsumo] = useState([]);
-  const [selecionado, setSelecionado] = useState(recipientes[1]);
-   const { user } = useContext(AuthContext);
+    
+    const [consumido, setConsumido] = useState(0);
+    const [meta, setMeta] = useState(0);
+    const [peso, setPeso] = useState('');
+    const [altura, setAltura] = useState('');
+    const [modalVisivel, setModalVisivel] = useState(false);
+    const [historicoConsumo, setHistoricoConsumo] = useState([]);
+    const [quantidadeSelecionada, setQuantidadeSelecionada] = useState(250);
+    const [telaAtiva, setTelaAtiva] = useState('hoje');
 
-  const porcentagem = meta > 0 ? consumido / meta : 0;
+    
+    const storageKey = user ? `waterTrackerData_${user.id}` : null;
 
-useEffect(() => {
-    const loadWaterData = async () => {
-      if (!user) return; // Se não há usuário, não faz nada
+    const recipientes = [
+      { id: 'pequeno', amount: 150, label: '150ml', icon: '🥃' },
+      { id: 'medio', amount: 250, label: '250ml', icon: '🥤' },
+      { id: 'grande', amount: 500, label: '500ml', icon: '🍼' },
+      { id: 'garrafa', amount: 750, label: '750ml', icon: '🍾' }
+    ];
 
-      try {
-        const allWaterDataString = await AsyncStorage.getItem('@water_data');
-        const allWaterData = allWaterDataString ? JSON.parse(allWaterDataString) : {};
-        
-        // Pega os dados específicos deste usuário
-        const userData = allWaterData[user.id];
+    const porcentagem = meta > 0 ? Math.min((consumido / meta) * 100, 100) : 0;
 
-        if (userData) {
-          console.log(`Dados de água encontrados para o usuário ${user.id}:`, userData);
-          setMeta(userData.meta || 0);
-          setConsumido(userData.consumido || 0);
-          // Converte as strings de data de volta para objetos Date
-          const historicoComDatas = userData.historico.map(item => ({
-            ...item,
-            timestamp: new Date(item.timestamp),
-          }));
-          setHistoricoConsumo(historicoComDatas || []);
-          
-          // Se o usuário já tem uma meta, não precisa abrir o modal
-          if (userData.meta > 0) {
-            setModalVisivel(false);
-          }
-        } else {
-          console.log(`Nenhum dado de água encontrado para o usuário ${user.id}. Iniciando do zero.`);
-          // Se não há dados, reseta tudo e mantém o modal de cálculo aberto
-          setMeta(0);
+    
+    useEffect(() => {
+      const loadWaterData = async () => {
+        if (!storageKey) { 
           setConsumido(0);
+          setMeta(0);
+          setPeso('');
+          setAltura('');
           setHistoricoConsumo([]);
-          setModalVisivel(true);
+          return;
         }
-      } catch (e) {
-        console.error("Falha ao carregar dados de água.", e);
+        try {
+          const dadosSalvos = await AsyncStorage.getItem(storageKey);
+          if (dadosSalvos) {
+            const dados = JSON.parse(dadosSalvos);
+            setConsumido(dados.consumido || 0);
+            setMeta(dados.meta || 0);
+            setPeso(dados.peso || '');
+            setAltura(dados.altura || '');
+            setHistoricoConsumo(dados.historico || []);
+            
+            if (!dados.meta || dados.meta === 0) {
+              setModalVisivel(true);
+            }
+          } else {
+            
+            setConsumido(0);
+            setMeta(0);
+            setHistoricoConsumo([]);
+            setModalVisivel(true);
+          }
+        } catch (e) {
+          console.error("Falha ao carregar dados de água.", e);
+        }
+      };
+      loadWaterData();
+    }, [storageKey]); 
+    useEffect(() => {
+      const saveWaterData = async () => {
+        if (!storageKey) return; 
+
+        try {
+          const dados = {
+            consumido,
+            meta,
+            peso,
+            altura,
+            historico: historicoConsumo
+          };
+          await AsyncStorage.setItem(storageKey, JSON.stringify(dados));
+        } catch (e) {
+          console.error("Falha ao salvar dados de água.", e);
+        }
+      };
+
+      if (storageKey) {
+          saveWaterData();
       }
-    };
+    }, [consumido, meta, peso, altura, historicoConsumo, storageKey]);
 
-    loadWaterData();
-  }, [user]); // Roda esta função sempre que o 'user' mudar (login/logout)
-
-useEffect(() => {
-    const saveWaterData = async () => {
-      if (!user || meta === 0) return; // Não salva se não houver usuário ou meta definida
-
-      try {
-        const allWaterDataString = await AsyncStorage.getItem('@water_data');
-        const allWaterData = allWaterDataString ? JSON.parse(allWaterDataString) : {};
-
-        // Cria ou atualiza os dados para o usuário atual
-        allWaterData[user.id] = {
-          meta,
-          consumido,
-          historico: historicoConsumo,
-        };
-
-        await AsyncStorage.setItem('@water_data', JSON.stringify(allWaterData));
-        console.log(`Dados de água salvos para o usuário ${user.id}`);
-      } catch (e) {
-        console.error("Falha ao salvar dados de água.", e);
+    
+    const calcularMeta = () => {
+      const pesoNum = parseFloat(peso);
+      
+      if (!pesoNum || pesoNum <= 0) {
+        Alert.alert('Atenção', 'Por favor, insira um peso válido.');
+        return;
       }
+      
+      const metaCalculada = Math.round(pesoNum * 35);
+      setMeta(metaCalculada);
+      setModalVisivel(false);
     };
 
-    saveWaterData();
-  }, [consumido, meta, historicoConsumo, user]);
-
-
-  const calcularMeta = () => {
-    Keyboard.dismiss();
-    const pesoNum = parseFloat(peso);
-    const alturaNum = parseFloat(altura);
-    if (!pesoNum || pesoNum <= 0 || !alturaNum || alturaNum <= 0) {
-      Alert.alert('Atenção', 'Por favor, insira valores válidos para peso e altura.');
-      return;
-    }
-    const metaCalculada = Math.round(pesoNum * 35);
-    setMeta(metaCalculada);
-    setConsumido(0);
-    setHistoricoConsumo([]);
-    setModalVisivel(false);
-  };
-
-  const handleBeber = () => {
-    if (meta === 0) {
-      setModalVisivel(true);
-      return;
-    }
-    if (!selecionado) {
-      Alert.alert('Selecione uma quantidade', 'Clique em um dos recipientes acima antes de beber.');
-      return;
-    }
-    const { amount, img } = selecionado;
-    const novoConsumoTotal = Math.min(consumido + amount, meta);
-    setConsumido(novoConsumoTotal);
-    const novoRegistro = {
-      id: Date.now().toString(),
-      quantidade: amount,
-      imagem: img,
-      timestamp: new Date(),
+    
+    const adicionarAgua = () => {
+      if (meta === 0) {
+        setModalVisivel(true);
+        return;
+      }
+      
+      const novoConsumo = Math.min(consumido + quantidadeSelecionada, meta);
+      setConsumido(novoConsumo);
+      
+      const novoRegistro = {
+        id: Date.now(),
+        quantidade: quantidadeSelecionada,
+        timestamp: new Date().toLocaleString('pt-BR')
+      };
+      
+      setHistoricoConsumo([novoRegistro, ...historicoConsumo]);
     };
-    setHistoricoConsumo([novoRegistro, ...historicoConsumo]);
-  };
 
-  const abrirModalRecalculo = () => setModalVisivel(true);
+    
+    const resetarConsumo = () => {
+      Alert.alert(
+        'Confirmar Reset',
+        'Tem certeza que deseja resetar o consumo de hoje?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Resetar', onPress: () => {
+              setConsumido(0);
+              setHistoricoConsumo([]);
+            }
+          },
+        ],
+        { cancelable: false }
+      );
+    };
 
-  const TelaHistorico = () => (
-    <SafeAreaView style={styles.historicoContainer}>
-      <Text style={styles.historicoTitle}>Histórico de Consumo</Text>
-      <FlatList
-        data={historicoConsumo}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-        renderItem={({ item }) => (
-          <View style={styles.historicoItem}>
-            <Image source={item.imagem} style={styles.historicoImagem} />
-            <View style={styles.historicoDetalhes}>
-              <Text style={styles.historicoQuantidade}>{item.quantidade} ml</Text>
-              <Text style={styles.historicoTimestamp}>
-                {item.timestamp.toLocaleDateString('pt-BR')} às {item.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              </Text>
+    
+    const TelaHoje = () => (
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.aguinhaHeader}>
+          <View style={styles.aguinhaTitleGroup}>
+            <Text style={styles.aguinhaIcon}>💧</Text>
+            <Text style={styles.aguinhaTitle}>Hidratação</Text>
+          </View>
+          <Text style={styles.aguinhaSubtitle}>Atinja seu objetivo diário</Text>
+        </View>
+
+        <View style={styles.aguinhaCard}>
+          <View style={styles.aguinhaCardHeader}>
+            <TouchableOpacity style={styles.aguinhaButtonOutline} onPress={() => setModalVisivel(true)}>
+              <Text style={styles.aguinhaButtonOutlineText}>⚙️ Configurar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.aguinhaButtonOutline, styles.aguinhaResetButton]} onPress={resetarConsumo}>
+              <Text style={styles.aguinhaButtonOutlineText}>🔄 Reset</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.aguinhaCardContent}>
+            <View style={styles.aguinhaDisplay}>
+              <Text style={styles.aguinhaAmount}>{consumido}</Text>
+              <Text style={styles.aguinhaUnit}>ml</Text>
+            </View>
+            <Text style={styles.aguinhaProgressText}>
+              de {meta}ml ({Math.round(porcentagem)}% concluído)
+            </Text>
+
+            <View style={styles.aguinhaProgressBarContainer}>
+              <View style={[styles.aguinhaProgressBar, { width: `${porcentagem}%` }]}></View>
+            </View>
+            <View style={styles.aguinhaProgressLabels}>
+              <Text style={styles.aguinhaLabel}>0ml</Text>
+              <Text style={styles.aguinhaLabel}>{meta}ml</Text>
+            </View>
+
+            <View style={styles.aguinhaSelector}>
+              <Text style={styles.aguinhaLabel}>Quantidade a adicionar:</Text>
+              <View style={styles.aguinhaGrid}>
+                {recipientes.map((recipiente) => (
+                  <TouchableOpacity
+                    key={recipiente.id}
+                    style={[
+                      styles.aguinhaSelectorButton,
+                      quantidadeSelecionada === recipiente.amount && styles.aguinhaSelectorButtonSelected
+                    ]}
+                    onPress={() => setQuantidadeSelecionada(recipiente.amount)}
+                  >
+                    <Text style={styles.aguinhaSelectorIcon}>{recipiente.icon}</Text>
+                    <Text style={styles.aguinhaSelectorLabel}>{recipiente.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              onPress={adicionarAgua}
+              style={[styles.aguinhaMainButton, meta === 0 && styles.disabledButton]}
+              disabled={meta === 0}
+            >
+              <Text style={styles.aguinhaMainButtonText}>➕ Beber {quantidadeSelecionada}ml</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {meta > 0 && (
+          <View style={styles.aguinhaMetaInfo}>
+            <Text style={styles.aguinhaIcon}>🎯</Text>
+            <View>
+              <Text style={styles.aguinhaMetaText}>Meta diária: {meta}ml</Text>
+              {peso && (
+                <Text style={styles.aguinhaMetaSubtext}>
+                  Baseado no seu peso de {peso}kg
+                </Text>
+              )}
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.historicoVazio}>Você ainda não bebeu água hoje.</Text>}
-      />
-    </SafeAreaView>
-  );
+      </ScrollView>
+    );
 
-  const TelaHoje = () => (
-    <View style={{flex: 1}}>
-      <View style={styles.mainContent}>
-
-      <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
-          </TouchableOpacity>
-          
-        <View>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Atinja o seu</Text>
-            <Text style={styles.headerTitleBold}>objetivo diário</Text>
-
-            
-          </View>
-          <TouchableOpacity style={styles.goalMarkerContainer} onPress={abrirModalRecalculo}>
-            <View style={styles.goalLine} />
-            <View style={styles.goalFlag}>
-              <Text style={styles.goalText}>{meta > 0 ? `${meta}ml` : 'Definir Meta'}</Text>
-            </View>
-          </TouchableOpacity>
-          <View style={styles.displayContainer}>
-            <Text style={styles.consumedAmount}>{consumido}</Text>
-            <Text style={styles.consumedUnit}>ml</Text>
-          </View>
-          <Text style={styles.percentageText}>
-            {meta > 0 ? `${Math.round(porcentagem * 100)}% concluído` : 'Calcule sua meta para começar'}
-          </Text>
+    
+    const TelaHistorico = () => (
+      <View style={styles.aguinhaContainer}>
+        <View style={styles.aguinhaHeader}>
+          <Text style={styles.aguinhaTitle}>Histórico de Consumo</Text>
+          <Text style={styles.aguinhaSubtitle}>Registros de hoje</Text>
         </View>
-        <View style={styles.bottomControls}>
-          <View style={styles.quickAddContainer}>
-            {recipientes.map((recipiente) => {
-              const isSelected = selecionado && selecionado.id === recipiente.id;
-              return (
-                <TouchableOpacity
-                  key={recipiente.id}
-                  style={[styles.quickAddButton, isSelected && styles.quickAddButtonSelected]}
-                  onPress={() => setSelecionado(recipiente)}>
-                  <Image source={recipiente.img} style={styles.quickAddImage} />
-                  <Text style={[styles.quickAddText, isSelected && styles.quickAddTextSelected]}>{recipiente.amount} ml</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-          <TouchableOpacity style={styles.mainButton} onPress={handleBeber}>
-            <Text style={styles.mainButtonText}>BEBER</Text>
-          </TouchableOpacity>
 
-          
+        <View style={styles.aguinhaCard}>
+          <View style={styles.aguinhaCardContent}>
+            {historicoConsumo.length === 0 ? (
+              <View style={styles.aguinhaEmptyHistory}>
+                <Text style={styles.aguinhaIcon}>💧</Text>
+                <Text style={styles.emptyHistoryText}>Nenhum registro hoje</Text>
+                <Text style={styles.aguinhaEmptyHistorySubtext}>Comece a beber água!</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.aguinhaHistoryList}>
+                {historicoConsumo.map((registro) => (
+                  <View 
+                    key={registro.id}
+                    style={styles.aguinhaHistoryItem}
+                  >
+                    <View style={styles.aguinhaHistoryItemDetails}>
+                      <Text style={styles.aguinhaIcon}>💧</Text>
+                      <View>
+                        <Text style={styles.aguinhaHistoryQuantity}>
+                          {registro.quantidade}ml
+                        </Text>
+                        <Text style={styles.aguinhaHistoryTimestamp}>
+                          {registro.timestamp}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <AnimatedWaterFill progress={porcentagem} />
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisivel}
-        onRequestClose={() => { if (meta > 0) setModalVisivel(false) }}
-      >
-        <ScrollView contentContainerStyle={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Personalize sua Meta</Text>
-            <Text style={styles.modalSubtitle}>Insira seus dados para um cálculo preciso.</Text>
-            <View style={styles.inputContainer}>
-              <Image source={require("../../assets/copo.png")} style={styles.inputIcon} />
-              <TextInput style={styles.input} placeholder="Sua altura (cm)" keyboardType="numeric" value={altura} onChangeText={setAltura} />
+    return (
+      <View style={styles.aguinhaApp}>
+        
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalVisivel}
+          onRequestClose={() => { if (meta > 0) setModalVisivel(false) }}
+        >
+          <View style={styles.aguinhaModalOverlay}>
+            <View style={styles.aguinhaModalContent}>
+              <Text style={styles.aguinhaModalTitle}>👤 Configure sua Meta</Text>
+              <View style={styles.aguinhaFormGroup}>
+                <Text style={styles.aguinhaLabel}>Peso (kg)</Text>
+                <TextInput
+                  id="peso"
+                  keyboardType="numeric"
+                  placeholder="Ex: 70"
+                  value={peso}
+                  onChangeText={setPeso}
+                  style={styles.aguinhaInput}
+                />
+              </View>
+              <View style={styles.aguinhaFormGroup}>
+                <Text style={styles.aguinhaLabel}>Altura (cm) - opcional</Text>
+                <TextInput
+                  id="altura"
+                  keyboardType="numeric"
+                  placeholder="Ex: 175"
+                  value={altura}
+                  onChangeText={setAltura} 
+                  style={styles.aguinhaInput}
+                />
+              </View>
+              <View style={styles.aguinhaInfoBox}>
+                <Text style={styles.aguinhaInfoBoxText}>💡 Sua meta será calculada como 35ml por kg de peso corporal.</Text>
+              </View>
+              <TouchableOpacity 
+                onPress={calcularMeta} 
+                style={[styles.aguinhaMainButton, !peso && styles.disabledButton]}
+                disabled={!peso}
+              >
+                <Text style={styles.aguinhaMainButtonText}>Calcular Minha Meta</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.inputContainer}>
-              <Image source={require("../../assets/copo.png")} style={styles.inputIcon} />
-              <TextInput style={styles.input} placeholder="Seu peso (kg)" keyboardType="numeric" value={peso} onChangeText={setPeso} />
-            </View>
-            <TouchableOpacity style={styles.modalButton} onPress={calcularMeta}>
-              <Text style={styles.modalButtonText}>Calcular Minha Meta</Text>
-            </TouchableOpacity>
           </View>
-        </ScrollView>
-      </Modal>
-      
-      <View style={{flex: 1}}>
-        {telaAtiva === 'hoje' ? <TelaHoje /> : <TelaHistorico />}
-      </View>
+        </Modal>
 
-      {}
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navButton} onPress={() => setTelaAtiva('hoje')}>
-          <Image 
-            source={require("../../assets/copo.png")} 
-            style={[
-              styles.navIcon, 
-              { tintColor: telaAtiva === 'hoje' ? '#0D47A1' : '#757575' }
-            ]} 
-          />
-          <Text style={[styles.navText, { color: telaAtiva === 'hoje' ? '#0D47A1' : '#757575' }]}>
-            Hoje
-          </Text>
-        </TouchableOpacity>
+        
+        <View style={styles.aguinhaMainView}>
+          {telaAtiva === 'hoje' ? <TelaHoje /> : <TelaHistorico />}
+        </View>
 
-        <TouchableOpacity style={styles.navButton} onPress={() => setTelaAtiva('historico')}>
-          <Image 
-            source={require("../../assets/copo.png")} 
+        
+        <View style={styles.aguinhaNavbar}>
+          <TouchableOpacity 
             style={[
-              styles.navIcon, 
-              { tintColor: telaAtiva === 'historico' ? '#0D47A1' : '#757575' }
-            ]} 
-          />
-          <Text style={[styles.navText, { color: telaAtiva === 'historico' ? '#0D47A1' : '#757575' }]}>
-            Histórico
-          </Text>
-        </TouchableOpacity>
+              styles.aguinhaNavButton,
+              telaAtiva === 'hoje' && styles.aguinhaNavButtonActive
+            ]}
+            onPress={() => setTelaAtiva('hoje')}
+          >
+            <Text style={styles.aguinhaIcon}>💧</Text>
+            <Text style={[styles.aguinhaNavText, telaAtiva === 'hoje' && styles.aguinhaNavButtonActiveText]}>Hoje</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[
+              styles.aguinhaNavButton,
+              telaAtiva === 'historico' && styles.aguinhaNavButtonActive
+            ]}
+            onPress={() => setTelaAtiva('historico')}
+          >
+            <Text style={styles.aguinhaIcon}>🎯</Text>
+            <Text style={[styles.aguinhaNavText, telaAtiva === 'historico' && styles.aguinhaNavButtonActiveText]}>Histórico</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </SafeAreaView>
-  );
-}
+    );
+  }
+
+  const styles = StyleSheet.create({
+    aguinhaApp: {
+      flex: 1,
+      backgroundColor: '#e3f2fd',
+    },
+    scrollContainer: {
+      paddingHorizontal: 16,
+      paddingBottom: 80,
+    },
+    aguinhaMainView: {
+      flex: 1,
+      paddingBottom: 60,
+    },
+    aguinhaContainer: {
+      flex: 1,
+      maxWidth: 480,
+      alignSelf: 'center',
+      width: '100%',
+    },
+    aguinhaHeader: {
+      alignItems: 'center',
+      paddingTop: 32,
+      paddingBottom: 16,
+    },
+    aguinhaTitleGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 8,
+    },
+    aguinhaIcon: {
+      fontSize: 28,
+      marginRight: 8,
+    },
+    aguinhaTitle: {
+      fontSize: 32,
+      fontWeight: '700',
+      color: '#0d47a1',
+    },
+    aguinhaSubtitle: {
+      color: '#1976d2',
+      fontSize: 16,
+    },
+    aguinhaCard: {
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+      padding: 16,
+      marginBottom: 16,
+    },
+    aguinhaCardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: '#e0e0e0',
+      paddingBottom: 12,
+      marginBottom: 12,
+    },
+    aguinhaButtonOutline: {
+      backgroundColor: '#e3f2fd',
+      borderColor: '#bbdefb',
+      borderWidth: 1,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    aguinhaButtonOutlineText: {
+      color: '#1976d2',
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    aguinhaResetButton: {
+      borderColor: '#ffcdd2',
+      backgroundColor: '#ffebee',
+    },
+    aguinhaCardContent: {
+      paddingTop: 8,
+      gap: 16,
+    },
+    aguinhaDisplay: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'center',
+      gap: 4,
+    },
+    aguinhaAmount: {
+      fontSize: 56,
+      fontWeight: '700',
+      color: '#0d47a1',
+    },
+    aguinhaUnit: {
+      fontSize: 20,
+      fontWeight: '500',
+      color: '#1976d2',
+      marginLeft: 4,
+    },
+    aguinhaProgressText: {
+      textAlign: 'center',
+      fontSize: 14,
+      color: '#1976d2',
+    },
+    aguinhaProgressBarContainer: {
+      width: '100%',
+      height: 16,
+      backgroundColor: '#bbdefb',
+      borderRadius: 8,
+      overflow: 'hidden',
+    },
+    aguinhaProgressBar: {
+      height: '100%',
+      backgroundColor: '#2196f3',
+    },
+    aguinhaProgressLabels: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    aguinhaSelector: {
+      marginTop: 16,
+    },
+    aguinhaLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: '#0d47a1',
+      marginBottom: 8,
+    },
+    aguinhaGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: 8,
+    },
+    aguinhaSelectorButton: {
+      minWidth: (width - 32 - 24) / 2 - 8,
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#f0f8ff',
+      borderWidth: 2,
+      borderColor: '#bbdefb',
+      borderRadius: 12,
+      paddingVertical: 12,
+    },
+    aguinhaSelectorButtonSelected: {
+      borderColor: '#2196f3',
+      backgroundColor: '#bbdefb',
+      transform: [{ scale: 1.05 }],
+    },
+    aguinhaSelectorIcon: {
+      fontSize: 24,
+    },
+    aguinhaSelectorLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: '#0d47a1',
+      marginTop: 4,
+    },
+    aguinhaMainButton: {
+      width: '100%',
+      paddingVertical: 16,
+      backgroundColor: '#2196f3',
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 16,
+    },
+    disabledButton: {
+      backgroundColor: '#a0a0a0',
+    },
+    aguinhaMainButtonText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: 'white',
+    },
+    aguinhaMetaInfo: {
+      backgroundColor: '#e8f5e9',
+      borderColor: '#c8e6c9',
+      borderWidth: 1,
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginTop: 16,
+    },
+    aguinhaMetaText: {
+      fontWeight: '600',
+      color: '#2e7d32',
+      fontSize: 16,
+    },
+    aguinhaMetaSubtext: {
+      fontSize: 14,
+      color: '#43a047',
+    },
+    aguinhaEmptyHistory: {
+      alignItems: 'center',
+      paddingVertical: 48,
+      gap: 8,
+    },
+    emptyHistoryText: {
+      fontSize: 16,
+      color: '#555',
+    },
+    aguinhaEmptyHistorySubtext: {
+      fontSize: 14,
+      color: '#1976d2',
+    },
+    aguinhaHistoryList: {
+      maxHeight: height * 0.5,
+    },
+    aguinhaHistoryItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#e3f2fd',
+      padding: 12,
+      borderRadius: 12,
+      marginBottom: 12,
+    },
+    aguinhaHistoryItemDetails: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    aguinhaHistoryQuantity: {
+      fontWeight: '600',
+      fontSize: 16,
+      color: '#0d47a1',
+    },
+    aguinhaHistoryTimestamp: {
+      fontSize: 12,
+      color: '#424242',
+    },
+    aguinhaModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+    },
+    aguinhaModalContent: {
+      backgroundColor: 'white',
+      borderRadius: 16,
+      padding: 24,
+      width: '100%',
+      maxWidth: 400,
+      gap: 16,
+    },
+    aguinhaModalTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: '#0d47a1',
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    aguinhaFormGroup: {
+      gap: 8,
+    },
+    aguinhaInput: {
+      width: '100%',
+      padding: 12,
+      borderColor: '#bbdefb',
+      borderWidth: 1,
+      borderRadius: 8,
+      fontSize: 16,
+      color: '#424242',
+      backgroundColor: '#f9f9f9',
+    },
+    aguinhaInfoBox: {
+      backgroundColor: '#e3f2fd',
+      borderLeftColor: '#2196f3',
+      borderLeftWidth: 4,
+      padding: 12,
+      borderRadius: 8,
+    },
+    aguinhaInfoBoxText: {
+      fontSize: 14,
+      color: '#1976d2',
+      lineHeight: 20,
+    },
+    aguinhaNavbar: {
+      flexDirection: 'row',
+      backgroundColor: 'white',
+      borderTopWidth: 1,
+      borderTopColor: '#e0e0e0',
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+      height: 60,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 5,
+      elevation: 5,
+    },
+    aguinhaNavButton: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    aguinhaNavButtonActive: {
+      borderTopWidth: 3,
+      borderTopColor: '#2196f3',
+    },
+    aguinhaNavText: {
+      fontSize: 12,
+      color: '#757575',
+      marginTop: 2,
+    },
+    aguinhaNavButtonActiveText: {
+      color: '#2196f3',
+      fontWeight: '700',
+    },
+  });
+
+
+  export default Aguinha;

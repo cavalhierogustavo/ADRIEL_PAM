@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
-  // Container principal
+  
   container: {
     flex: 1,
     backgroundColor: '#E3F2FD',
@@ -33,7 +33,7 @@ voltarbtn:{
       color: '#0D47A1',
     },
 
-  // --- Animação de preenchimento de água ---
+  
   waterFillContainer: {
     position: 'absolute',
     bottom: 0,
@@ -53,7 +53,7 @@ voltarbtn:{
     borderRadius: width,
   },
 
-  // --- Bolhas animadas ---
+  
   bubblesContainer: {
     position: 'absolute',
     bottom: 0,
@@ -75,7 +75,7 @@ voltarbtn:{
     elevation: 2,
   },
 
-  // --- Conteúdo principal ---
+  
   mainContent: {
     flex: 1,
     justifyContent: 'space-between',
@@ -95,7 +95,7 @@ voltarbtn:{
     fontWeight: '700',
   },
 
-  // --- Meta de consumo ---
+  
   goalMarkerContainer: {
     position: 'absolute',
     top: height * 0.25,
@@ -125,7 +125,7 @@ voltarbtn:{
     color: '#33691E',
   },
 
-  // --- Display de consumo ---
+  
   displayContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -158,7 +158,7 @@ voltarbtn:{
     paddingHorizontal: 20,
   },
 
-  // --- Botões de ações rápidas ---
+  
   bottomControls: {
     paddingHorizontal: 30,
     paddingBottom: 40,
@@ -204,7 +204,7 @@ voltarbtn:{
     fontWeight: '700',
   },
 
-  // --- Botão principal ---
+  
   mainButton: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -231,7 +231,7 @@ voltarbtn:{
     color: '#0D47A1',
   },
 
-  // --- Barra de navegação inferior ---
+  
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -328,7 +328,7 @@ voltarbtn:{
     fontSize: 16,
   },
 
-  // --- Histórico ---
+  
   historicoContainer: {
     flex: 1,
     backgroundColor: '#F0F8FF',

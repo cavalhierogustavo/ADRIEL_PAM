@@ -12,14 +12,14 @@ import {
   Easing,
   StyleSheet,
   Alert,
-  TextInput, // <-- IMPORTAR TextInput
+  TextInput, 
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from '../../context/AuthContext';
-import axios from 'axios'; // <-- IMPORTAR axios
+import axios from 'axios'; 
 
-// Seus dados e imagens locais
+
 const localImages = { remedio: require("../../assets/copo.png"), /* ... */ };
 const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" }, /* ... */ ];
 
@@ -27,7 +27,7 @@ export default function Home() {
   const navigation = useNavigation();
   const { user, logout } = useContext(AuthContext);
 
-  // --- ESTADOS ---
+  
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const [confirmLogoutVisible, setConfirmLogoutVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -35,7 +35,7 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const animationValues = useRef(data.map(() => new Animated.Value(0))).current;
 
-  // --- EFFECTS ---
+  
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -62,7 +62,7 @@ export default function Home() {
     Animated.stagger(100, animations).start();
   }, []);
 
-  // --- FUNÇÕES HANDLER ---
+  
 
   const handleEditProfile = () => {
     setProfileModalVisible(false);
@@ -85,7 +85,7 @@ export default function Home() {
       return;
     }
 
-    const apiUrl = `http://127.0.0.1:8000/api/usuarios/${user.id}`; // Lembre-se de usar seu IP
+    const apiUrl = `http://127.0.0.1:8000/api/usuarios/${user.id}`;
 
     try {
       await axios.delete(apiUrl );
@@ -98,7 +98,7 @@ export default function Home() {
     }
   };
 
-  // --- RENDERIZAÇÃO ---
+  
 
   const renderItem = ({ item, index }) => {
     const translateY = animationValues[index].interpolate({ inputRange: [0, 1], outputRange: [30, 0] });
@@ -123,7 +123,7 @@ export default function Home() {
         contentContainerStyle={styles.grid}
       />
 
-      {/* Modal de Perfil */}
+      
       <Modal
         animationType="fade"
         transparent={true}
@@ -149,7 +149,7 @@ export default function Home() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Modal de Confirmação de Logout */}
+      
       <Modal
         animationType="fade"
         transparent={true}
@@ -172,7 +172,7 @@ export default function Home() {
         </View>
       </Modal>
 
-      {/* Modal de Confirmação de Deleção */}
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -210,7 +210,7 @@ export default function Home() {
   );
 }
 
-// Estilos (certifique-se de que todos os estilos que definimos antes estão aqui)
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -218,9 +218,9 @@ const styles = StyleSheet.create({
   },
   confirmModalOverlay: {
     flex: 1,
-    justifyContent: 'center', // Centraliza verticalmente
-    alignItems: 'center',     // Centraliza horizontalmente
-    backgroundColor: 'rgba(0,0,0,0.5)', // Fundo mais escuro
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   confirmModalView: {
     width: '85%',
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   confirmModalButton: {
-    flex: 1, // Faz os botões dividirem o espaço
+    flex: 1, 
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: 5, // Espaçamento entre os botões
+    marginHorizontal: 5, 
   },
   confirmModalButtonText: {
     fontSize: 16,

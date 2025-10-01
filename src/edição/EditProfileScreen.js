@@ -53,7 +53,7 @@ const EditProfileScreen = ({ navigation }) => {
     }
     setIsSubmitting(true);
 
-    // Lembre-se de usar o IP da sua máquina!
+    
     const apiUrl = `http://127.0.0.1:8000/api/usuarios/${user.id}`;
     const formData = new FormData( );
 
@@ -145,7 +145,7 @@ const EditProfileScreen = ({ navigation }) => {
   );
 };
 
-// Seus estilos (sem alterações)
+  
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

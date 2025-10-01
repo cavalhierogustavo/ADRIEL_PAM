@@ -1,4 +1,3 @@
-// screens/LoginScreen.js
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator,TouchableOpacity } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
@@ -6,7 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [loading, setLoading] = useState(false); // <-- CORREÇÃO: Estado de loading declarado
+  const [loading, setLoading] = useState(false);
 
   const { login } = useContext(AuthContext);
 
@@ -15,19 +14,18 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert('Erro', 'Por favor, preencha o email e a senha.');
       return;
     }
-    setLoading(true); // Agora 'setLoading' existe e funciona
+    setLoading(true); 
     
     const result = await login(email, senha);
 
     if (result === true) {
-      // Sucesso! O AppNavigator cuida do redirecionamento.
-      // Não precisamos fazer nada aqui.
+
     } else {
-      // Se o login falhou, 'result' conterá a mensagem de erro.
+      
       Alert.alert('Erro de Login', result);
     }
     
-    setLoading(false); // 'setLoading' também funciona aqui
+    setLoading(false);
   };
 
   return (
