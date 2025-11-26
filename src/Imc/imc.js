@@ -5,115 +5,92 @@ import { AuthContext } from '../../context/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 
-function CalculadoraIMC() {
+function CalculadoraMetabolica() {
   const { user } = useContext(AuthContext); 
 
-  
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [imc, setImc] = useState(0);
-  const [categoria, setCategoria] = useState('');
+  const [nivel, setNivel] = useState('');
   const [modalVisivel, setModalVisivel] = useState(false);
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
-  const [historiaIMC, setHistoriaIMC] = useState([]);
-  const [telaAtiva, setTelaAtiva] = useState('calculadora');
+  const [nivelSelecionado, setNivelSelecionado] = useState(null);
+  const [historicoCalculos, setHistoricoCalculos] = useState([]);
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
 
-  
-  const storageKey = user ? `imcData_${user.id}` : null;
+  const storageKey = user ? `metabolicaData_${user.id}` : null;
 
-  const categorias = [
+  const niveisMetabolicos = [
     { 
-      id: 'magreza-grave', 
-      nome: 'Magreza Grave', 
+      id: 'baixo', 
+      nome: 'Baixo Metabolismo', 
       min: 0, 
-      max: 16.0, 
+      max: 18.4, 
       cor: '#7B1FA2',
-      corBg: 'rgba(123, 31, 162, 0.1)',
-      emoji: '⚠️',
-      recomenda: 'Procure um médico ou nutricionista urgentemente'
+      corBg: 'rgba(123, 31, 162, 0.12)',
+      emoji: '🐌',
+      recomendacao: 'Considere aumentar atividade física gradual'
     },
     { 
-      id: 'magreza-moderada', 
-      nome: 'Magreza Moderada', 
-      min: 16.0, 
-      max: 16.99, 
-      cor: '#E91E63',
-      corBg: 'rgba(233, 30, 99, 0.1)',
-      emoji: '⚠️',
-      recomenda: 'Aumente a ingestão calórica com orientação nutricional'
-    },
-    { 
-      id: 'magreza-leve', 
-      nome: 'Magreza Leve', 
-      min: 17.0, 
-      max: 18.49, 
-      cor: '#FF5722',
-      corBg: 'rgba(255, 87, 34, 0.1)',
-      emoji: '⚠️',
-      recomenda: 'Mantenha uma dieta equilibrada e pratique exercícios'
-    },
-    { 
-      id: 'saudavel', 
-      nome: 'Saudável', 
+      id: 'normal-minimo', 
+      nome: 'Metabolismo Normal', 
       min: 18.5, 
       max: 24.9, 
       cor: '#4CAF50',
-      corBg: 'rgba(76, 175, 80, 0.1)',
-      emoji: '✅',
-      recomenda: 'Parabéns! Continue mantendo hábitos saudáveis'
+      corBg: 'rgba(76, 175, 80, 0.12)',
+      emoji: '⚖️',
+      recomendacao: 'Excelente! Mantenha hábitos saudáveis'
     },
     { 
-      id: 'sobrepeso', 
-      nome: 'Sobrepeso', 
+      id: 'moderado', 
+      nome: 'Metabolismo Moderado', 
       min: 25.0, 
       max: 29.9, 
       cor: '#FF9800',
-      corBg: 'rgba(255, 152, 0, 0.1)',
-      emoji: '⚠️',
-      recomenda: 'Considere reduzir peso com dieta e exercícios'
+      corBg: 'rgba(255, 152, 0, 0.12)',
+      emoji: '⚡',
+      recomendacao: 'Considere ajustes na dieta e exercícios'
     },
     { 
-      id: 'obesidade-1', 
-      nome: 'Obesidade Grau I', 
+      id: 'alto', 
+      nome: 'Metabolismo Alto', 
       min: 30.0, 
       max: 34.9, 
       cor: '#F44336',
-      corBg: 'rgba(244, 67, 54, 0.1)',
-      emoji: '🚨',
-      recomenda: 'Busque orientação médica para plano de emagrecimento'
+      corBg: 'rgba(244, 67, 54, 0.12)',
+      emoji: '🔥',
+      recomendacao: 'Consulte profissional para orientação'
     },
     { 
-      id: 'obesidade-2', 
-      nome: 'Obesidade Grau II', 
+      id: 'muito-alto', 
+      nome: 'Metabolismo Muito Alto', 
       min: 35.0, 
       max: 39.9, 
       cor: '#D32F2F',
-      corBg: 'rgba(211, 47, 47, 0.1)',
+      corBg: 'rgba(211, 47, 47, 0.12)',
       emoji: '🚨',
-      recomenda: 'Acompanhamento médico é essencial para sua saúde'
+      recomendacao: 'Acompanhamento médico recomendado'
     },
     { 
-      id: 'obesidade-3', 
-      nome: 'Obesidade Grau III', 
+      id: 'critico', 
+      nome: 'Nível Crítico', 
       min: 40.0, 
       max: 999, 
       cor: '#B71C1C',
-      corBg: 'rgba(183, 28, 28, 0.1)',
-      emoji: '🚨',
-      recomenda: 'Atenção médica urgente é necessária imediatamente'
+      corBg: 'rgba(183, 28, 28, 0.12)',
+      emoji: '⚠️',
+      recomendacao: 'Buscar assistência médica urgente'
     }
   ];
 
-  
   useEffect(() => {
-    const loadIMCData = async () => {
+    const loadMetabolicaData = async () => {
       if (!storageKey) { 
         setPeso('');
         setAltura('');
         setImc(0);
-        setCategoria('');
-        setCategoriaSelecionada(null);
-        setHistoriaIMC([]);
+        setNivel('');
+        setNivelSelecionado(null);
+        setHistoricoCalculos([]);
         return;
       }
       try {
@@ -123,26 +100,25 @@ function CalculadoraIMC() {
           setPeso(dados.peso || '');
           setAltura(dados.altura || '');
           setImc(dados.imc || 0);
-          setCategoria(dados.categoria || '');
-          setHistoriaIMC(dados.historico || []);
+          setNivel(dados.nivel || '');
+          setHistoricoCalculos(dados.historico || []);
           
-          // Recriar categoria selecionada
-          if (dados.categoria) {
-            const categoriaEncontrada = categorias.find(cat => cat.nome === dados.categoria);
-            if (categoriaEncontrada) {
-              setCategoriaSelecionada(categoriaEncontrada);
+          if (dados.nivel) {
+            const nivelEncontrado = niveisMetabolicos.find(niv => niv.nome === dados.nivel);
+            if (nivelEncontrado) {
+              setNivelSelecionado(nivelEncontrado);
             }
           }
         }
       } catch (e) {
-        console.error("Falha ao carregar dados de IMC.", e);
+        console.error("Falha ao carregar dados metabólicos.", e);
       }
     };
-    loadIMCData();
+    loadMetabolicaData();
   }, [storageKey]); 
 
   useEffect(() => {
-    const saveIMCData = async () => {
+    const saveMetabolicaData = async () => {
       if (!storageKey) return; 
 
       try {
@@ -150,22 +126,21 @@ function CalculadoraIMC() {
           peso,
           altura,
           imc,
-          categoria,
-          historico: historiaIMC
+          nivel,
+          historico: historicoCalculos
         };
         await AsyncStorage.setItem(storageKey, JSON.stringify(dados));
       } catch (e) {
-        console.error("Falha ao salvar dados de IMC.", e);
+        console.error("Falha ao salvar dados metabólicos.", e);
       }
     };
 
     if (storageKey) {
-        saveIMCData();
+        saveMetabolicaData();
     }
-  }, [peso, altura, imc, categoria, historiaIMC, storageKey]);
+  }, [peso, altura, imc, nivel, historicoCalculos, storageKey]);
 
-  
-  const calcularIMC = () => {
+  const calcularMetabolismo = () => {
     const pesoNum = parseFloat(peso.replace(',', '.'));
     const alturaNum = parseFloat(altura.replace(',', '.')) / 100;
 
@@ -187,579 +162,601 @@ function CalculadoraIMC() {
     const imcCalculado = pesoNum / (alturaNum * alturaNum);
     const imcArredondado = Math.round(imcCalculado * 10) / 10;
 
-    // Encontrar categoria
-    const categoriaEncontrada = categorias.find(cat => 
-      imcCalculado >= cat.min && imcCalculado <= cat.max
+    const nivelEncontrado = niveisMetabolicos.find(niv => 
+      imcCalculado >= niv.min && imcCalculado <= niv.max
     );
 
     setImc(imcArredondado);
-    setCategoria(categoriaEncontrada.nome);
-    setCategoriaSelecionada(categoriaEncontrada);
+    setNivel(nivelEncontrado.nome);
+    setNivelSelecionado(nivelEncontrado);
 
-    // Adicionar ao histórico
     const novoRegistro = {
       id: Date.now(),
       peso: pesoNum,
       altura: alturaNum,
       imc: imcArredondado,
-      categoria: categoriaEncontrada.nome,
+      nivel: nivelEncontrado.nome,
       timestamp: new Date().toLocaleString('pt-BR')
     };
 
-    setHistoriaIMC([novoRegistro, ...historiaIMC.slice(0, 9)]); // Manter apenas 10 últimos
+    setHistoricoCalculos([novoRegistro, ...historicoCalculos.slice(0, 7)]);
   };
 
-  const limparCampos = () => {
+  const limparDados = () => {
     setPeso('');
     setAltura('');
     setImc(0);
-    setCategoria('');
-    setCategoriaSelecionada(null);
+    setNivel('');
+    setNivelSelecionado(null);
   };
 
-  const TelaCalculadora = () => (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.imcHeader}>
-        <View style={styles.imcTitleGroup}>
-          <Text style={styles.imcIcon}>⚖️</Text>
-          <Text style={styles.imcTitle}>Calculadora IMC</Text>
+  const limparHistorico = () => {
+    Alert.alert(
+      'Limpar Histórico',
+      'Tem certeza que deseja apagar todos os registros?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Limpar', style: 'destructive', onPress: () => setHistoricoCalculos([]) }
+      ]
+    );
+  };
+
+  const TelaPrincipal = () => (
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleGroup}>
+          <Text style={styles.titleIcon}>🧬</Text>
+          <Text style={styles.title}>Metabolismo</Text>
         </View>
-        <Text style={styles.imcSubtitle}>Índice de Massa Corporal</Text>
+        <Text style={styles.subtitle}>Índice Metabólico Corporal</Text>
       </View>
 
-      <View style={styles.imcCard}>
-        <View style={styles.imcCardHeader}>
-          <TouchableOpacity style={styles.imcButtonOutline} onPress={limparCampos}>
-            <Text style={styles.imcButtonOutlineText}>🗑️ Limpar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.imcButtonOutline} onPress={() => setModalVisivel(true)}>
-            <Text style={styles.imcButtonOutlineText}>📊 Info</Text>
-          </TouchableOpacity>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardHeaderText}>Calculadora</Text>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={limparDados}>
+              <Text style={styles.secondaryButtonText}>🗑️</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => setModalVisivel(true)}>
+              <Text style={styles.secondaryButtonText}>❓</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.imcCardContent}>
-          <View style={styles.imcInputGroup}>
-            <Text style={styles.imcLabel}>Peso (kg)</Text>
+        <View style={styles.formGroup}>
+          <View style={styles.inputField}>
+            <Text style={styles.label}>Peso (kg)</Text>
             <TextInput
               keyboardType="numeric"
-              placeholder="Ex: 70.5"
+              placeholder="Ex: 65.5"
               value={peso}
               onChangeText={setPeso}
-              style={styles.imcInput}
+              style={styles.input}
             />
           </View>
 
-          <View style={styles.imcInputGroup}>
-            <Text style={styles.imcLabel}>Altura (cm)</Text>
+          <View style={styles.inputField}>
+            <Text style={styles.label}>Altura (cm)</Text>
             <TextInput
               keyboardType="numeric"
-              placeholder="Ex: 175"
+              placeholder="Ex: 168"
               value={altura}
               onChangeText={setAltura}
-              style={styles.imcInput}
+              style={styles.input}
             />
           </View>
 
           <TouchableOpacity 
-            onPress={calcularIMC}
-            style={[styles.imcMainButton, (!peso || !altura) && styles.disabledButton]}
+            onPress={calcularMetabolismo}
+            style={[styles.primaryButton, (!peso || !altura) && styles.buttonDisabled]}
             disabled={!peso || !altura}
           >
-            <Text style={styles.imcMainButtonText}>🧮 Calcular IMC</Text>
+            <Text style={styles.primaryButtonText}>🔬 Analisar Metabolismo</Text>
           </TouchableOpacity>
 
           {imc > 0 && (
-            <View style={styles.imcResultCard}>
-              <View style={styles.imcResultDisplay}>
-                <Text style={styles.imcResultValue}>{imc}</Text>
-                <Text style={styles.imcResultUnit}>kg/m²</Text>
+            <View style={[styles.resultBox, { borderColor: nivelSelecionado?.cor }]}>
+              <View style={styles.resultDisplay}>
+                <Text style={[styles.resultValue, { color: nivelSelecionado?.cor }]}>{imc}</Text>
+                <Text style={styles.resultUnit}>kg/m²</Text>
               </View>
-              <Text style={[styles.imcResultCategory, { color: categoriaSelecionada?.cor }]}>
-                {categoria}
-              </Text>
+              <View style={[styles.levelBadge, { backgroundColor: nivelSelecionado?.corBg }]}>
+                <Text style={[styles.levelEmoji]}>{nivelSelecionado?.emoji}</Text>
+                <Text style={[styles.levelName, { color: nivelSelecionado?.cor }]}>{nivel}</Text>
+              </View>
             </View>
           )}
         </View>
       </View>
 
-      {/* Categorias */}
-      <View style={styles.imcCategoriesContainer}>
-        <Text style={styles.imcCategoriesTitle}>📈 Classificação do IMC</Text>
-        {categorias.map((cat) => (
-          <TouchableOpacity
-            key={cat.id}
-            style={[
-              styles.imcCategoryItem,
-              categoriaSelecionada?.id === cat.id && { borderColor: cat.cor, backgroundColor: cat.corBg },
-              categoriaSelecionada?.id === cat.id && styles.imcCategoryItemSelected
-            ]}
-            onPress={() => setCategoriaSelecionada(cat)}
-          >
-            <Text style={styles.imcCategoryEmoji}>{cat.emoji}</Text>
-            <View style={styles.imcCategoryContent}>
-              <Text style={[styles.imcCategoryName, { color: cat.cor }]}>{cat.nome}</Text>
-              <Text style={styles.imcCategoryRange}>
-                {cat.max >= 999 ? `${cat.min}+` : `${cat.min} - ${cat.max}`}
-              </Text>
-            </View>
-            {categoriaSelecionada?.id === cat.id && (
-              <Text style={[styles.imcCategoryCheck, { color: cat.cor }]}>✓</Text>
+      <TouchableOpacity 
+        style={styles.toggleSection}
+        onPress={() => setMostrarHistorico(!mostrarHistorico)}
+      >
+        <Text style={styles.toggleIcon}>{mostrarHistorico ? '🔼' : '🔽'}</Text>
+        <Text style={styles.toggleText}>
+          Histórico de Análises ({historicoCalculos.length})
+        </Text>
+        <Text style={styles.toggleAction}>
+          {mostrarHistorico ? 'Ocultar' : 'Ver'}
+        </Text>
+      </TouchableOpacity>
+
+      {mostrarHistorico && (
+        <View style={styles.historySection}>
+          <View style={styles.historyHeader}>
+            <Text style={styles.historyTitle}>📋 Registros Anteriores</Text>
+            {historicoCalculos.length > 0 && (
+              <TouchableOpacity onPress={limparHistorico}>
+                <Text style={styles.clearHistoryText}>Limpar</Text>
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
-        ))}
+          </View>
+
+          <View style={styles.historyCard}>
+            {historicoCalculos.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyIcon}>📊</Text>
+                <Text style={styles.emptyText}>Nenhuma análise ainda</Text>
+                <Text style={styles.emptySubtext}>Comece calculando seu metabolismo!</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
+                {historicoCalculos.map((registro) => {
+                  const nivel = niveisMetabolicos.find(n => n.nome === registro.nivel);
+                  return (
+                    <View 
+                      key={registro.id}
+                      style={[styles.historyItem, { borderLeftColor: nivel?.cor || '#4CAF50' }]}
+                    >
+                      <View style={styles.historyContent}>
+                        <View style={styles.historyHeader}>
+                          <Text style={styles.historyEmoji}>{nivel?.emoji || '📊'}</Text>
+                          <View style={styles.historyMain}>
+                            <Text style={styles.historyValue}>
+                              IMC: {registro.imc} kg/m²
+                            </Text>
+                            <Text style={[styles.historyLevel, { color: nivel?.cor }]}>
+                              {registro.nivel}
+                            </Text>
+                          </View>
+                          <Text style={styles.historyTime}>{registro.timestamp}</Text>
+                        </View>
+                        <Text style={styles.historyDetails}>
+                          {registro.peso}kg • {Math.round(registro.altura * 100)}cm
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      )}
+
+      <View style={styles.levelsSection}>
+        <Text style={styles.levelsTitle}>📈 Classificação Metabólica</Text>
+        <View style={styles.levelsGrid}>
+          {niveisMetabolicos.map((nivel) => (
+            <TouchableOpacity
+              key={nivel.id}
+              style={[
+                styles.levelItem,
+                nivelSelecionado?.id === nivel.id && { 
+                  borderColor: nivel.cor, 
+                  backgroundColor: nivel.corBg 
+                }
+              ]}
+              onPress={() => setNivelSelecionado(nivel)}
+            >
+              <Text style={styles.levelItemEmoji}>{nivel.emoji}</Text>
+              <View style={styles.levelItemContent}>
+                <Text style={[styles.levelItemName, { color: nivel.cor }]}>{nivel.nome}</Text>
+                <Text style={styles.levelItemRange}>
+                  {nivel.max >= 999 ? `${nivel.min}+` : `${nivel.min} - ${nivel.max}`}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );
 
-  const TelaHistorico = () => (
-    <View style={styles.imcContainer}>
-      <View style={styles.imcHeader}>
-        <Text style={styles.imcTitle}>Histórico de IMC</Text>
-        <Text style={styles.imcSubtitle}>Seus últimos cálculos</Text>
-      </View>
-
-      <View style={styles.imcCard}>
-        <View style={styles.imcCardContent}>
-          {historiaIMC.length === 0 ? (
-            <View style={styles.imcEmptyHistory}>
-              <Text style={styles.imcIcon}>📊</Text>
-              <Text style={styles.emptyHistoryText}>Nenhum cálculo ainda</Text>
-              <Text style={styles.imcEmptyHistorySubtext}>Comece calculando seu IMC!</Text>
-            </View>
-          ) : (
-            <ScrollView style={styles.imcHistoryList}>
-              {historiaIMC.map((registro) => {
-                const cat = categorias.find(c => c.nome === registro.categoria);
-                return (
-                  <View 
-                    key={registro.id}
-                    style={[styles.imcHistoryItem, { borderLeftColor: cat?.cor || '#2196F3' }]}
-                  >
-                    <View style={styles.imcHistoryItemDetails}>
-                      <Text style={styles.imcHistoryEmoji}>📊</Text>
-                      <View>
-                        <Text style={styles.imcHistoryIMC}>
-                          IMC: {registro.imc} kg/m²
-                        </Text>
-                        <Text style={[styles.imcHistoryCategory, { color: cat?.cor }]}>
-                          {registro.categoria}
-                        </Text>
-                        <Text style={styles.imcHistoryDetails}>
-                          {registro.peso}kg • {Math.round(registro.altura * 100)}cm
-                        </Text>
-                        <Text style={styles.imcHistoryTimestamp}>
-                          {registro.timestamp}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-
   return (
-    <View style={styles.imcApp}>
+    <View style={styles.mainContainer}>
       <Modal
         animationType="fade"
         transparent={true}
         visible={modalVisivel}
         onRequestClose={() => setModalVisivel(false)}
       >
-        <View style={styles.imcModalOverlay}>
-          <View style={styles.imcModalContent}>
-            <Text style={styles.imcModalTitle}>📊 Sobre o IMC</Text>
-            <View style={styles.imcInfoBox}>
-              <Text style={styles.imcInfoBoxText}>
-                💡 O Índice de Massa Corporal (IMC) é uma medida que relaciona o peso e a altura de uma pessoa.
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>🧬 Sobre o Metabolismo</Text>
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                💡 O Índice Metabólico Corporal (IMC) relaciona peso e altura para avaliar o metabolismo.
               </Text>
             </View>
-            <View style={styles.imcInfoBox}>
-              <Text style={styles.imcInfoBoxText}>
-                🔍 Fórmula: IMC = peso ÷ (altura × altura)
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                🔬 Fórmula: IMC = peso ÷ (altura × altura)
               </Text>
             </View>
-            <View style={styles.imcInfoBox}>
-              <Text style={styles.imcInfoBoxText}>
-                ⚠️ Importante: Este é um indicador geral. Para uma avaliação completa da sua saúde, consulte sempre um profissional médico.
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                ⚠️ Importante: Este é um indicador geral. Para avaliação completa, consulte um profissional de saúde.
               </Text>
             </View>
             <TouchableOpacity 
               onPress={() => setModalVisivel(false)}
-              style={styles.imcModalButton}
+              style={styles.modalButton}
             >
-              <Text style={styles.imcModalButtonText}>Entendi</Text>
+              <Text style={styles.modalButtonText}>Entendi</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      <View style={styles.imcMainView}>
-        {telaAtiva === 'calculadora' ? <TelaCalculadora /> : <TelaHistorico />}
-      </View>
-
-      <View style={styles.imcNavbar}>
-        <TouchableOpacity 
-          style={[
-            styles.imcNavButton,
-            telaAtiva === 'calculadora' && styles.imcNavButtonActive
-          ]}
-          onPress={() => setTelaAtiva('calculadora')}
-        >
-          <Text style={styles.imcIcon}>⚖️</Text>
-          <Text style={[styles.imcNavText, telaAtiva === 'calculadora' && styles.imcNavButtonActiveText]}>
-            IMC
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[
-            styles.imcNavButton,
-            telaAtiva === 'historico' && styles.imcNavButtonActive
-          ]}
-          onPress={() => setTelaAtiva('historico')}
-        >
-          <Text style={styles.imcIcon}>📊</Text>
-          <Text style={[styles.imcNavText, telaAtiva === 'historico' && styles.imcNavButtonActiveText]}>
-            Histórico
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TelaPrincipal />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  imcApp: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#e3f2fd',
+    backgroundColor: '#f8f3ff',
   },
-  scrollContainer: {
+  container: {
     paddingHorizontal: 16,
-    paddingBottom: 80,
+    paddingBottom: 24,
   },
-  imcMainView: {
-    flex: 1,
-    paddingBottom: 60,
-  },
-  imcContainer: {
-    flex: 1,
-    maxWidth: 480,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  imcHeader: {
+  header: {
     alignItems: 'center',
     paddingTop: 32,
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
-  imcTitleGroup: {
+  titleGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  imcIcon: {
-    fontSize: 28,
+  titleIcon: {
+    fontSize: 32,
     marginRight: 8,
   },
-  imcTitle: {
-    fontSize: 32,
+  title: {
+    fontSize: 28,
     fontWeight: '700',
-    color: '#0d47a1',
+    color: '#4A148C',
   },
-  imcSubtitle: {
-    color: '#1976d2',
-    fontSize: 16,
+  subtitle: {
+    color: '#7B1FA2',
+    fontSize: 15,
   },
-  imcCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    shadowColor: '#4A148C',
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-    padding: 16,
+    shadowRadius: 6,
+    elevation: 4,
     marginBottom: 16,
   },
-  imcCardHeader: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingBottom: 12,
-    marginBottom: 12,
+    borderBottomColor: '#e8e3f0',
   },
-  imcButtonOutline: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#bbdefb',
-    borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
+  cardHeaderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A148C',
+  },
+  buttonGroup: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  imcButtonOutlineText: {
-    color: '#1976d2',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  imcCardContent: {
-    paddingTop: 8,
-    gap: 16,
-  },
-  imcInputGroup: {
     gap: 8,
   },
-  imcLabel: {
+  secondaryButton: {
+    backgroundColor: '#f3edf9',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e1d5e8',
+  },
+  secondaryButtonText: {
+    fontSize: 16,
+  },
+  formGroup: {
+    padding: 16,
+    gap: 16,
+  },
+  inputField: {
+    gap: 6,
+  },
+  label: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#0d47a1',
+    color: '#4A148C',
   },
-  imcInput: {
+  input: {
     width: '100%',
     padding: 12,
-    borderColor: '#bbdefb',
     borderWidth: 1,
-    borderRadius: 8,
+    borderColor: '#d3b9e3',
+    borderRadius: 10,
     fontSize: 16,
-    color: '#424242',
-    backgroundColor: '#f9f9f9',
+    color: '#2d1b4e',
+    backgroundColor: '#fbf9fc',
   },
-  imcMainButton: {
+  primaryButton: {
     width: '100%',
     paddingVertical: 16,
-    backgroundColor: '#2196f3',
+    backgroundColor: '#7B1FA2',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
-  disabledButton: {
-    backgroundColor: '#a0a0a0',
+  buttonDisabled: {
+    backgroundColor: '#b39ddb',
   },
-  imcMainButtonText: {
-    fontSize: 18,
+  primaryButtonText: {
+    fontSize: 16,
     fontWeight: '600',
     color: 'white',
   },
-  imcResultCard: {
-    backgroundColor: '#f0f8ff',
-    borderRadius: 16,
-    padding: 20,
+  resultBox: {
+    backgroundColor: '#f9f5fd',
+    borderRadius: 14,
+    padding: 16,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#bbdefb',
   },
-  imcResultDisplay: {
+  resultDisplay: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 4,
+    gap: 6,
     marginBottom: 8,
   },
-  imcResultValue: {
-    fontSize: 48,
+  resultValue: {
+    fontSize: 36,
     fontWeight: '700',
-    color: '#0d47a1',
   },
-  imcResultUnit: {
-    fontSize: 18,
+  resultUnit: {
+    fontSize: 16,
     fontWeight: '500',
-    color: '#1976d2',
+    color: '#7B1FA2',
   },
-  imcResultCategory: {
+  levelBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  levelEmoji: {
     fontSize: 18,
+  },
+  levelName: {
+    fontSize: 14,
     fontWeight: '600',
   },
-  imcCategoriesContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 20,
-    padding: 16,
+  toggleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    shadowColor: '#4A148C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  toggleIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  toggleText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A148C',
+    marginLeft: 8,
+  },
+  toggleAction: {
+    fontSize: 14,
+    color: '#7B1FA2',
+    fontWeight: '500',
+  },
+  historySection: {
     marginBottom: 16,
   },
-  imcCategoriesTitle: {
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  historyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4A148C',
+  },
+  clearHistoryText: {
+    fontSize: 14,
+    color: '#F44336',
+    fontWeight: '500',
+  },
+  historyCard: {
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    gap: 6,
+  },
+  emptyIcon: {
+    fontSize: 24,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#5e4b7a',
+  },
+  emptySubtext: {
+    fontSize: 13,
+    color: '#7B1FA2',
+  },
+  historyList: {
+    maxHeight: height * 0.35,
+  },
+  historyItem: {
+    backgroundColor: '#f8f3ff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+  },
+  historyContent: {
+    gap: 4,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  historyEmoji: {
+    fontSize: 18,
+  },
+  historyMain: {
+    flex: 1,
+  },
+  historyValue: {
+    fontWeight: '600',
+    fontSize: 15,
+    color: '#4A148C',
+  },
+  historyLevel: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: 1,
+  },
+  historyTime: {
+    fontSize: 11,
+    color: '#7B1FA2',
+    fontWeight: '500',
+  },
+  historyDetails: {
+    fontSize: 12,
+    color: '#6a5a83',
+    marginLeft: 28,
+  },
+  levelsSection: {
+    marginBottom: 16,
+  },
+  levelsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#0d47a1',
+    color: '#4A148C',
     textAlign: 'center',
     marginBottom: 16,
   },
-  imcCategoryItem: {
+  levelsGrid: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+  },
+  levelItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f8f3ff',
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  imcCategoryItemSelected: {
-    transform: [{ scale: 1.02 }],
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  imcCategoryEmoji: {
+  levelItemEmoji: {
     fontSize: 20,
     marginRight: 12,
   },
-  imcCategoryContent: {
+  levelItemContent: {
     flex: 1,
   },
-  imcCategoryName: {
-    fontSize: 16,
+  levelItemName: {
+    fontSize: 15,
     fontWeight: '600',
   },
-  imcCategoryRange: {
-    fontSize: 14,
-    color: '#666',
+  levelItemRange: {
+    fontSize: 13,
+    color: '#7B1FA2',
     marginTop: 2,
   },
-  imcCategoryCheck: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  imcEmptyHistory: {
-    alignItems: 'center',
-    paddingVertical: 48,
-    gap: 8,
-  },
-  emptyHistoryText: {
-    fontSize: 16,
-    color: '#555',
-  },
-  imcEmptyHistorySubtext: {
-    fontSize: 14,
-    color: '#1976d2',
-  },
-  imcHistoryList: {
-    maxHeight: height * 0.5,
-  },
-  imcHistoryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e3f2fd',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-  },
-  imcHistoryItemDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  imcHistoryEmoji: {
-    fontSize: 20,
-  },
-  imcHistoryIMC: {
-    fontWeight: '600',
-    fontSize: 16,
-    color: '#0d47a1',
-  },
-  imcHistoryCategory: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  imcHistoryDetails: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
-  },
-  imcHistoryTimestamp: {
-    fontSize: 12,
-    color: '#424242',
-    marginTop: 2,
-  },
-  imcModalOverlay: {
+  modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(74, 20, 140, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 20,
   },
-  imcModalContent: {
+  modalContent: {
     backgroundColor: 'white',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 360,
     gap: 16,
   },
-  imcModalTitle: {
-    fontSize: 22,
+  modalTitle: {
+    fontSize: 20,
     fontWeight: '700',
-    color: '#0d47a1',
+    color: '#4A148C',
     textAlign: 'center',
     marginBottom: 8,
   },
-  imcInfoBox: {
-    backgroundColor: '#e3f2fd',
-    borderLeftColor: '#2196f3',
+  infoSection: {
+    backgroundColor: '#f8f3ff',
+    borderLeftColor: '#7B1FA2',
     borderLeftWidth: 4,
-    padding: 12,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 10,
   },
-  imcInfoBoxText: {
+  infoText: {
     fontSize: 14,
-    color: '#1976d2',
+    color: '#4A148C',
     lineHeight: 20,
   },
-  imcModalButton: {
-    backgroundColor: '#2196f3',
+  modalButton: {
+    backgroundColor: '#7B1FA2',
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
   },
-  imcModalButtonText: {
+  modalButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: 'white',
   },
-  imcNavbar: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: 60,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  imcNavButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imcNavButtonActive: {
-    borderTopWidth: 3,
-    borderTopColor: '#2196f3',
-  },
-  imcNavText: {
-    fontSize: 12,
-    color: '#757575',
-    marginTop: 2,
-  },
-  imcNavButtonActiveText: {
-    color: '#2196f3',
-    fontWeight: '700',
-  },
 });
 
-export default CalculadoraIMC;
+export default CalculadoraMetabolica;

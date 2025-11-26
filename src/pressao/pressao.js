@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'; // 1. Importar useRef
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,29 +14,28 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const PressaoArterial = () => {
+const MonitorCardiaco = () => {
   const [sistolica, setSistolica] = useState('');
   const [diastolica, setDiastolica] = useState('');
   const [pulso, setPulso] = useState('');
   const [resultado, setResultado] = useState(null);
   const [historicoPressao, setHistoricoPressao] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalInfo, setModalInfo] = useState('');
+  const [modalVisivel, setModalVisivel] = useState(false);
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
   
   const { user } = useContext(AuthContext);
 
-  // 2. Criar uma referência para o ScrollView
   const scrollViewRef = useRef(null);
 
-const fadeInAnimation = useRef(new Animated.Value(0)).current;
-const slideInAnimation = useRef(new Animated.Value(30)).current;
+  const fadeInAnimation = useRef(new Animated.Value(0)).current;
+  const slideInAnimation = useRef(new Animated.Value(30)).current;
 
-  const storageKey = user ? `pressaoData_${user.id}` : null;
+  const storageKey = user ? `cardiacoData_${user.id}` : null;
 
   useEffect(() => {
-    const loadPressaoData = async () => {
+    const loadCardiacoData = async () => {
       if (storageKey) {
         try {
           const dadosSalvos = await AsyncStorage.getItem(storageKey);
@@ -45,28 +44,28 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
             setHistoricoPressao(dados.historicoPressao || []);
           }
         } catch (error) {
-          console.log('Erro ao carregar dados da pressão:', error);
+          console.log('Erro ao carregar dados do monitor:', error);
         }
       }
     };
-    loadPressaoData();
+    loadCardiacoData();
   }, [storageKey]);
 
   useEffect(() => {
-    const savePressaoData = async () => {
+    const saveCardiacoData = async () => {
       if (storageKey) {
         try {
           const dados = { historicoPressao };
           await AsyncStorage.setItem(storageKey, JSON.stringify(dados));
         } catch (error) {
-          console.log('Erro ao salvar dados da pressão:', error);
+          console.log('Erro ao salvar dados do monitor:', error);
         }
       }
     };
-    savePressaoData();
+    saveCardiacoData();
   }, [historicoPressao, storageKey]);
 
-  const getClassificacaoPressao = (sist, diast, puls) => {
+  const getClassificacaoCardiaca = (sist, diast, puls) => {
     const s = parseFloat(sist);
     const d = parseFloat(diast);
     const p = parseFloat(puls);
@@ -80,41 +79,41 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
     let gravidade = '';
     
     if (s < 90 || d < 60) {
-      classificacao = 'Hipotensão';
-      cor = '#6B73FF';
-      recomendacao = 'Pressão baixa. Evite mudanças bruscas de posição.';
-      icone = '🔽';
-      gravidade = 'atencao';
+      classificacao = 'Hipotensão Crítica';
+      cor = '#7B1FA2';
+      recomendacao = 'Pressão arterial baixa. Evite movimentos bruscos e procure ajuda médica.',
+      icone = '🆘';
+      gravidade = 'critica';
     } else if (s < 120 && d < 80) {
-      classificacao = 'Normal';
-      cor = '#10B981';
-      recomendacao = 'Pressão ideal. Continue com hábitos saudáveis.';
+      classificacao = 'Pressão Ideal';
+      cor = '#4CAF50';
+      recomendacao = 'Excelente! Mantenha hábitos saudáveis e exercícios regulares.',
       icone = '✅';
-      gravidade = 'normal';
+      gravidade = 'ideal';
     } else if ((s >= 120 && s <= 129) && d < 80) {
-      classificacao = 'Elevada';
-      cor = '#F59E0B';
-      recomendacao = 'Pressão elevada. Adote estilo de vida saudável.';
+      classificacao = 'Pressão Elevada';
+      cor = '#FF9800';
+      recomendacao = 'Considere adotar dieta com baixo teor de sal e exercícios.',
       icone = '⚠️';
       gravidade = 'atencao';
     } else if ((s >= 130 && s <= 139) || (d >= 80 && d <= 89)) {
-      classificacao = 'Hipertensão Estágio 1';
+      classificacao = 'Hipertensão Leve';
       cor = '#F97316';
-      recomendacao = 'Consulte seu médico para avaliação e acompanhamento.';
+      recomendacao: 'Consulte cardiologista para avaliação e possível tratamento.',
       icone = '⚠️';
-      gravidade = 'atencao';
+      gravidade: 'atencao';
     } else if (s >= 140 || d >= 90) {
-      classificacao = 'Hipertensão Estágio 2';
-      cor = '#EF4444';
-      recomendacao = 'Procure acompanhamento médico urgente.';
+      classificacao: 'Hipertensão Moderada';
+      cor: '#D32F2F';
+      recomendacao: 'Acompanhamento médico urgente é essencial.',
       icone = '🚨';
-      gravidade = 'alerta';
+      gravidade: 'alerta';
     } else if (s > 180 || d > 120) {
-      classificacao = 'Crise Hipertensiva';
-      cor = '#DC2626';
-      recomendacao = 'PROCURE ATENDIMENTO MÉDICO IMEDIATO!';
+      classificacao: 'Crise Hipertensiva';
+      cor: '#B71C1C';
+      recomendacao: 'PROCURE ATENDIMENTO MÉDICO IMEDIATO!',
       icone = '🚨';
-      gravidade = 'emergencia';
+      gravidade: 'emergencia';
     }
     
     let pulsoClassificacao = '';
@@ -122,17 +121,17 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
     let pulsoIcone = '';
     
     if (p < 60) {
-      pulsoClassificacao = 'Bradicardia (Baixo)';
-      pulsoCor = '#6B73FF';
-      pulsoIcone = '🟦';
+      pulsoClassificacao = 'Bradicardia (Lenta)';
+      pulsoCor = '#7B1FA2';
+      pulsoIcone = '🐌';
     } else if (p <= 100) {
-      pulsoClassificacao = 'Normal';
-      pulsoCor = '#10B981';
-      pulsoIcone = '🟢';
+      pulsoClassificacao = 'Frequência Normal';
+      pulsoCor = '#4CAF50';
+      pulsoIcone = '💚';
     } else {
-      pulsoClassificacao = 'Taquicardia (Alto)';
-      pulsoCor = '#EF4444';
-      pulsoIcone = '🔴';
+      pulsoClassificacao = 'Taquicardia (Rápida)';
+      pulsoCor = '#D32F2F';
+      pulsoIcone: '🔥';
     }
     
     return {
@@ -141,13 +140,13 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
     };
   };
 
-  const verificarPressao = () => {
+  const monitorarPressao = () => {
     const s = parseFloat(sistolica);
     const d = parseFloat(diastolica);
     const p = parseFloat(pulso);
     
     if (!sistolica || !diastolica || !pulso) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
     
@@ -161,7 +160,7 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
       return;
     }
     
-    const classificacao = getClassificacaoPressao(s, d, p);
+    const classificacao = getClassificacaoCardiaca(s, d, p);
     if (!classificacao) {
       Alert.alert('Erro', 'Não foi possível classificar os valores.');
       return;
@@ -194,17 +193,29 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
     ]).start();
     
     setHistoricoPressao(prevHistorico => {
-      const novoHistorico = [novoResultado, ...prevHistorico].slice(0, 20);
+      const novoHistorico = [novoResultado, ...prevHistorico].slice(0, 15);
       return novoHistorico;
     });
 
-    // 4. Rolar para o topo após calcular
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  const abrirModalInfo = (texto) => {
-    setModalInfo(texto);
-    setModalVisible(true);
+  const limparDados = () => {
+    setSistolica('');
+    setDiastolica('');
+    setPulso('');
+    setResultado(null);
+  };
+
+  const limparHistorico = () => {
+    Alert.alert(
+      'Limpar Histórico',
+      'Tem certeza que deseja apagar todos os registros cardíacos?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Limpar', style: 'destructive', onPress: () => setHistoricoPressao([]) }
+      ]
+    );
   };
 
   const renderResultCard = () => {
@@ -218,7 +229,7 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
     return (
       <Animated.View 
         style={[
-          styles.resultCard, 
+          styles.resultBox, 
           { borderLeftColor: cor },
           { opacity: fadeInAnimation, transform: [{ translateY: slideInAnimation }] }
         ]}
@@ -230,10 +241,13 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
           <Text style={[styles.resultTitle, { color: cor }]}>{classificacao}</Text>
         </View>
 
-        <View style={styles.pressaoContainer}>
+        <View style={styles.pressaoDisplay}>
           <View style={styles.pressaoCard}>
             <Text style={styles.pressaoLabel}>Sistólica</Text>
             <Text style={[styles.pressaoValue, { color: cor }]}>{sistolica} mmHg</Text>
+          </View>
+          <View style={styles.pressaoSeparator}>
+            <Text style={styles.pressaoSeparatorText}>/</Text>
           </View>
           <View style={styles.pressaoCard}>
             <Text style={styles.pressaoLabel}>Diastólica</Text>
@@ -241,275 +255,336 @@ const slideInAnimation = useRef(new Animated.Value(30)).current;
           </View>
         </View>
 
-        <View style={[styles.pulsoCard, { borderColor: pulsoCor + '33' }]}>
+        <View style={[styles.pulsoBox, { borderColor: pulsoCor }]}>
           <Text style={styles.pulsoLabel}>Frequência Cardíaca</Text>
           <Text style={[styles.pulsoValue, { color: pulsoCor }]}>{pulso} bpm</Text>
-          <Text style={[styles.pulsoClassificacao, { color: pulsoCor }]}>
+          <Text style={[styles.pulsoCategory, { color: pulsoCor }]}>
             {pulsoIcone} {pulsoClassificacao}
           </Text>
         </View>
 
-        <Text style={styles.resultDescription}>{recomendacao}</Text>
+        <Text style={styles.resultRecommendation}>{recomendacao}</Text>
       </Animated.View>
-    );
-  };
-
-  const renderHistory = () => {
-    if (historicoPressao.length === 0) {
-      return (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyStateIcon}>📋</Text>
-          <Text style={styles.emptyStateText}>Nenhum registro de pressão arterial encontrado.</Text>
-        </View>
-      );
-    }
-
-    return (
-      <View style={styles.historyList}>
-        {historicoPressao.map((item) => (
-          <View key={item.id} style={[styles.historyItem, { borderLeftColor: item.cor }]}>
-            <View style={styles.historyContent}>
-              <View style={styles.historyMain}>
-                <Text style={styles.historyValue}>
-                  {item.sistolica}/{item.diastolica} mmHg
-                </Text>
-                <View style={styles.historyClassification}>
-                  <Text style={styles.historyClassificationIcon}>{item.icone}</Text>
-                  <Text style={[styles.historyClassificationText, { color: item.cor }]}>
-                    {item.classificacao}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.historyPulso}>
-                <Text style={[styles.historyPulsoText, { color: item.pulsoCor }]}>
-                  {item.pulso} bpm ({item.pulsoClassificacao})
-                </Text>
-              </View>
-              <View style={styles.historyMeta}>
-                <Text style={styles.historyMetaIcon}>📅</Text>
-                <Text style={styles.historyMetaText}>{item.data} às {item.hora}</Text>
-              </View>
-            </View>
-          </View>
-        ))}
-      </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Calculadora de Pressão Arterial</Text>
-          <TouchableOpacity 
-            style={styles.infoButton}
-            onPress={() => abrirModalInfo(
-              'Esta calculadora classifica a pressão arterial e frequência cardíaca. Os valores são baseados em diretrizes médicas. Sempre consulte seu médico para diagnóstico e tratamento adequado.'
-            )}
-          >
-            <Text style={styles.infoIcon}>ℹ️</Text>
-          </TouchableOpacity>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisivel}
+        onRequestClose={() => setModalVisivel(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>💓 Sobre Pressão Cardíaca</Text>
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                💡 A pressão arterial mede a força do sangue nas artérias em mmHg.
+              </Text>
+            </View>
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                📊 Valores normais: Sistólica 120 e Diastólica 80 em repouso.
+              </Text>
+            </View>
+            <View style={styles.infoSection}>
+              <Text style={styles.infoText}>
+                ⚠️ Importante: Para diagnóstico e tratamento, sempre consulte seu cardiologista.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisivel(false)}
+            >
+              <Text style={styles.modalButtonText}>Entendi</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </Modal>
 
-      {/* 3. Atribuir a referência ao ScrollView */}
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Nova Medição</Text>
-          
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Pressão Sistólica (mmHg)</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={sistolica}
-                onChangeText={setSistolica}
-                placeholder="Ex: 120"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
-                maxLength={3}
-              />
-              <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>💓</Text>
-              </View>
-            </View>
+        <View style={styles.header}>
+          <View style={styles.titleGroup}>
+            <Text style={styles.titleIcon}>💓</Text>
+            <Text style={styles.title}>Cardio Monitor</Text>
           </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Pressão Diastólica (mmHg)</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={diastolica}
-                onChangeText={setDiastolica}
-                placeholder="Ex: 80"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
-                maxLength={3}
-              />
-              <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>❤️</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Frequência Cardíaca (bpm)</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                value={pulso}
-                onChangeText={setPulso}
-                placeholder="Ex: 72"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
-                maxLength={3}
-              />
-              <View style={styles.inputIcon}>
-                <Text style={styles.inputIconText}>⚡</Text>
-              </View>
-            </View>
-          </View>
-
-          <TouchableOpacity style={styles.calculateButton} onPress={verificarPressao}>
-            <Text style={styles.calculateButtonText}>Calcular Pressão</Text>
-            <Text style={styles.calculateButtonIcon}>➡️</Text>
-          </TouchableOpacity>
+          <Text style={styles.subtitle}>Monitoramento Cardiovascular Inteligente</Text>
         </View>
 
-        {resultado && (
-          <View style={styles.resultSection}>
-            <Text style={styles.sectionTitle}>Resultado</Text>
-            {renderResultCard()}
+        <View style={styles.monitorCard}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardHeaderText}>Nova Avaliação</Text>
+            <View style={styles.buttonGroup}>
+              <TouchableOpacity style={styles.secondaryButton} onPress={limparDados}>
+                <Text style={styles.secondaryButtonText}>🗑️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.secondaryButton} onPress={() => setModalVisivel(true)}>
+                <Text style={styles.secondaryButtonText}>❓</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.formGroup}>
+            <View style={styles.inputField}>
+              <Text style={styles.label}>Pressão Sistólica (mmHg)</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={sistolica}
+                  onChangeText={setSistolica}
+                  placeholder="Ex: 120"
+                  keyboardType="numeric"
+                  maxLength={3}
+                />
+                <View style={styles.inputIcon}>
+                  <Text style={styles.inputIconText}>💗</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.inputField}>
+              <Text style={styles.label}>Pressão Diastólica (mmHg)</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={diastolica}
+                  onChangeText={setDiastolica}
+                  placeholder="Ex: 80"
+                  keyboardType="numeric"
+                  maxLength={3}
+                />
+                <View style={styles.inputIcon}>
+                  <Text style={styles.inputIconText}>💖</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.inputField}>
+              <Text style={styles.label}>Frequência Cardíaca (bpm)</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  value={pulso}
+                  onChangeText={setPulso}
+                  placeholder="Ex: 72"
+                  keyboardType="numeric"
+                  maxLength={3}
+                />
+                <View style={styles.inputIcon}>
+                  <Text style={styles.inputIconText}>⚡</Text>
+                </View>
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.primaryButton, (!sistolica || !diastolica || !pulso) && styles.buttonDisabled]}
+              onPress={monitorarPressao}
+              disabled={!sistolica || !diastolica || !pulso}
+            >
+              <Text style={styles.primaryButtonText}>💓 Monitorar Cardíaco</Text>
+            </TouchableOpacity>
+
+            {resultado && renderResultCard()}
+          </View>
+        </View>
+
+        <TouchableOpacity 
+          style={styles.toggleSection}
+          onPress={() => setMostrarHistorico(!mostrarHistorico)}
+        >
+          <Text style={styles.toggleIcon}>{mostrarHistorico ? '🔼' : '🔽'}</Text>
+          <Text style={styles.toggleText}>
+            Histórico Cardíaco ({historicoPressao.length})
+          </Text>
+          <Text style={styles.toggleAction}>
+            {mostrarHistorico ? 'Ocultar' : 'Ver'}
+          </Text>
+        </TouchableOpacity>
+
+        {mostrarHistorico && (
+          <View style={styles.historySection}>
+            <View style={styles.historyHeader}>
+              <Text style={styles.historyTitle}>📋 Registros Cardíacos</Text>
+              {historicoPressao.length > 0 && (
+                <TouchableOpacity onPress={limparHistorico}>
+                  <Text style={styles.clearHistoryText}>Limpar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.historyCard}>
+              {historicoPressao.length === 0 ? (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyIcon}>💓</Text>
+                  <Text style={styles.emptyText}>Nenhum registro ainda</Text>
+                  <Text style={styles.emptySubtext}>Comece monitorando sua saúde cardíaca!</Text>
+                </View>
+              ) : (
+                <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
+                  {historicoPressao.map((item) => (
+                    <View key={item.id} style={[styles.historyItem, { borderLeftColor: item.cor }]}>
+                      <View style={styles.historyIndicator} />
+                      <View style={styles.historyContent}>
+                        <View style={styles.historyHeader}>
+                          <Text style={styles.historyEmoji}>{item.icone}</Text>
+                          <View style={styles.historyMain}>
+                            <Text style={styles.historyValue}>
+                              {item.sistolica}/{item.diastolica} mmHg
+                            </Text>
+                            <Text style={[styles.historyClassification, { color: item.cor }]}>
+                              {item.classificacao}
+                            </Text>
+                          </View>
+                          <Text style={styles.historyTime}>{item.data}, {item.hora}</Text>
+                        </View>
+                        <Text style={[styles.historyPulse, { color: item.pulsoCor }]}>
+                          {item.pulso} bpm ({item.pulsoClassificacao})
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
           </View>
         )}
 
-        <View style={styles.historySection}>
-          <Text style={styles.sectionTitle}>Histórico de Medições</Text>
-          {renderHistory()}
+        <View style={styles.referenceSection}>
+          <Text style={styles.referenceTitle}>📊 Valores de Referência</Text>
+          <View style={styles.referenceCard}>
+            <View style={styles.referenceItem}>
+              <View style={styles.referenceHeader}>
+                <Text style={styles.referenceIcon}>✅</Text>
+                <Text style={styles.referenceName}>Pressão Ideal</Text>
+              </View>
+              <Text style={styles.referenceValue}>Sistólica: 120 mmHg | Diastólica: 80 mmHg</Text>
+            </View>
+            
+            <View style={styles.referenceItem}>
+              <View style={styles.referenceHeader}>
+                <Text style={styles.referenceIcon}>⚠️</Text>
+                <Text style={styles.referenceName}>Hipertensão</Text>
+              </View>
+              <Text style={styles.referenceValue}>Sistólica: ≥140 mmHg | Diastólica: ≥90 mmHg</Text>
+            </View>
+
+            <View style={styles.referenceItem}>
+              <View style={styles.referenceHeader}>
+                <Text style={styles.referenceIcon}>💚</Text>
+                <Text style={styles.referenceName}>Pulso Normal</Text>
+              </View>
+              <Text style={styles.referenceValue}>60-100 bpm (adulto em repouso)</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalIcon}>💡</Text>
-            <Text style={styles.modalText}>{modalInfo}</Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>Entendi</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 };
 
-// Seus estilos (styles) permanecem os mesmos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F8FA',
-  },
-  header: {
-    backgroundColor: '#FFFFFF',
-    paddingTop: 32,
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0D1C2E',
-    lineHeight: 30,
-    flex: 1,
-  },
-  infoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 122, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  infoIcon: {
-    fontSize: 20,
+    backgroundColor: '#f8f3ff',
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 24,
+    paddingHorizontal: 16,
   },
-  formSection: {
-    marginBottom: 32,
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+  header: {
+    alignItems: 'center',
+    paddingTop: 32,
+    paddingBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#0D1C2E',
-    lineHeight: 26,
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  titleIcon: {
+    fontSize: 32,
+    marginRight: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#4A148C',
+  },
+  subtitle: {
+    color: '#7B1FA2',
+    fontSize: 15,
+  },
+  monitorCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    shadowColor: '#4A148C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
     marginBottom: 16,
   },
-  inputGroup: {
-    marginBottom: 24,
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e8e3f0',
+  },
+  cardHeaderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A148C',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  secondaryButton: {
+    backgroundColor: '#f3edf9',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e1d5e8',
+  },
+  secondaryButtonText: {
+    fontSize: 16,
+  },
+  formGroup: {
+    padding: 16,
+    gap: 16,
+  },
+  inputField: {
+    gap: 6,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 12,
-    paddingLeft: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4A148C',
   },
   inputContainer: {
     position: 'relative',
   },
   input: {
-    height: 56,
-    backgroundColor: '#F7F8FA',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 16,
+    height: 52,
+    backgroundColor: '#fbf9fc',
+    borderWidth: 1,
+    borderColor: '#d3b9e3',
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingRight: 56,
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#0D1C2E',
+    paddingRight: 50,
+    fontSize: 16,
+    color: '#2d1b4e',
   },
   inputIcon: {
     position: 'absolute',
@@ -518,262 +593,319 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -10 }],
   },
   inputIconText: {
-    fontSize: 20,
+    fontSize: 18,
   },
-  calculateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  primaryButton: {
+    height: 52,
+    backgroundColor: '#7B1FA2',
+    borderRadius: 12,
     justifyContent: 'center',
-    height: 56,
-    backgroundColor: '#007AFF',
-    borderRadius: 16,
+    alignItems: 'center',
     marginTop: 8,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 8,
   },
-  calculateButtonText: {
-    fontSize: 18,
+  buttonDisabled: {
+    backgroundColor: '#b39ddb',
+  },
+  primaryButtonText: {
+    fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
-    marginRight: 8,
+    color: 'white',
   },
-  calculateButtonIcon: {
-    fontSize: 18,
-  },
-  resultSection: {
-    marginBottom: 32,
-  },
-  resultCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+  resultBox: {
+    backgroundColor: '#f9f5fd',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 2,
     borderLeftWidth: 6,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 4,
+    marginTop: 16,
   },
   resultHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
+    gap: 10,
   },
   resultIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
   resultIcon: {
-    fontSize: 24,
+    fontSize: 20,
   },
   resultTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    lineHeight: 26,
   },
-  pressaoContainer: {
+  pressaoDisplay: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 12,
+    gap: 8,
   },
   pressaoCard: {
     flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: '#F7F8FA',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f3ff',
+    borderRadius: 12,
     alignItems: 'center',
+  },
+  pressaoSeparator: {
+    paddingHorizontal: 8,
+  },
+  pressaoSeparatorText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#7B1FA2',
   },
   pressaoLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
-    color: '#6B7280',
+    color: '#7B1FA2',
     marginBottom: 4,
-    textAlign: 'center',
   },
   pressaoValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  pulsoCard: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: '#F7F8FA',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  pulsoLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#6B7280',
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  pulsoValue: {
     fontSize: 18,
     fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 2,
   },
-  pulsoClassificacao: {
-    fontSize: 10,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  resultDescription: {
-    fontSize: 16,
-    color: '#374151',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  historySection: {
-    marginBottom: 32,
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  historyList: {
-    gap: 16,
-  },
-  emptyState: {
-    backgroundColor: '#F7F8FA',
-    padding: 32,
-    borderRadius: 16,
+  pulsoBox: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f3ff',
+    borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    marginVertical: 12,
   },
-  emptyStateIcon: {
-    fontSize: 48,
+  pulsoLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#7B1FA2',
+    marginBottom: 4,
+  },
+  pulsoValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  pulsoCategory: {
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  resultRecommendation: {
+    fontSize: 14,
+    color: '#4A148C',
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  toggleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    shadowColor: '#4A148C',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  toggleIcon: {
+    fontSize: 16,
+    marginRight: 8,
+  },
+  toggleText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4A148C',
+    marginLeft: 8,
+  },
+  toggleAction: {
+    fontSize: 14,
+    color: '#7B1FA2',
+    fontWeight: '500',
+  },
+  historySection: {
     marginBottom: 16,
   },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  historyContent: {
-    flex: 1,
-  },
-  historyMain: {
+  historyHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
-    flexWrap: 'wrap',
+    paddingHorizontal: 4,
+  },
+  historyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4A148C',
+  },
+  clearHistoryText: {
+    fontSize: 14,
+    color: '#D32F2F',
+    fontWeight: '500',
+  },
+  historyCard: {
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    gap: 6,
+  },
+  emptyIcon: {
+    fontSize: 24,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#5e4b7a',
+  },
+  emptySubtext: {
+    fontSize: 13,
+    color: '#7B1FA2',
+  },
+  historyList: {
+    maxHeight: height * 0.4,
+  },
+  historyItem: {
+    flexDirection: 'row',
+    backgroundColor: '#f8f3ff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+  },
+  historyIndicator: {
+    width: 0,
+  },
+  historyContent: {
+    flex: 1,
+    marginLeft: 4,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
+  historyEmoji: {
+    fontSize: 16,
+  },
+  historyMain: {
+    flex: 1,
   },
   historyValue: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#0D1C2E',
-    marginBottom: 4,
-    marginRight: 8,
+    color: '#4A148C',
   },
   historyClassification: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexShrink: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: 1,
   },
-  historyClassificationIcon: {
-    fontSize: 14,
-    marginRight: 6,
-  },
-  historyClassificationText: {
-    fontSize: 14,
+  historyTime: {
+    fontSize: 11,
+    color: '#7B1FA2',
     fontWeight: '500',
   },
-  historyPulso: {
-    marginBottom: 8,
-  },
-  historyPulsoText: {
+  historyPulse: {
     fontSize: 12,
-    fontWeight: '500',
+    marginLeft: 26,
   },
-  historyMeta: {
+  referenceSection: {
+    marginBottom: 24,
+  },
+  referenceTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A148C',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  referenceCard: {
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+  },
+  referenceItem: {
+    marginBottom: 16,
+  },
+  referenceHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 6,
+    gap: 8,
   },
-  historyMetaIcon: {
-    fontSize: 12,
-    marginRight: 6,
+  referenceIcon: {
+    fontSize: 16,
   },
-  historyMetaText: {
-    fontSize: 12,
-    color: '#9CA3AF',
+  referenceName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#4A148C',
+  },
+  referenceValue: {
+    fontSize: 13,
+    color: '#7B1FA2',
+    marginLeft: 24,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(74, 20, 140, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    padding: 32,
-    borderRadius: 24,
-    margin: 24,
-    maxWidth: width - 48,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.25,
-    shadowRadius: 32,
-    elevation: 12,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 360,
+    gap: 16,
   },
-  modalIcon: {
-    fontSize: 48,
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 16,
-    color: '#374151',
-    lineHeight: 24,
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#4A148C',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 8,
+  },
+  infoSection: {
+    backgroundColor: '#f8f3ff',
+    borderLeftColor: '#7B1FA2',
+    borderLeftWidth: 4,
+    padding: 14,
+    borderRadius: 10,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#4A148C',
+    lineHeight: 20,
   },
   modalButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 32,
+    backgroundColor: '#7B1FA2',
+    borderRadius: 12,
     paddingVertical: 14,
-    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 8,
   },
   modalButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: 'white',
   },
 });
 
-export default PressaoArterial;
+export default MonitorCardiaco;

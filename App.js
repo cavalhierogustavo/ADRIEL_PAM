@@ -16,9 +16,10 @@ import HomeScreen from "./src/home/home"; // Supondo que 'aguinha' seja sua tela
 import aguinha from "./src/aguinha/aguinha"
 import cadastro from "./src/Cadastro/cadastro"
 import EditProfileScreen from './src/edição/EditProfileScreen';
-import imc from './src/Imc/imc';
-import Glicemia from './src/glicemia/glicemia';
-import Pressao from './src/pressao/pressao';
+import Imc from './src/Imc/imc';
+import glice from './src/glicemia/glicemia';
+import pressao from './src/pressao/pressao';
+
 const Stack = createNativeStackNavigator();
 
 const LogoutButton = () => {
@@ -61,11 +62,11 @@ const AppNavigator = () => {
             headerRight: () => <LogoutButton />
           }}
         />
-          <Stack.Screen name="Aguinha" component={aguinha} />
-          <Stack.Screen name="Imc" component={imc} />
-          <Stack.Screen name="Pressao" component={Pressao} />
-          <Stack.Screen name="glicemia" component={Glicemia} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
+          <Stack.Screen name="Aguinha" component={aguinha} />
+          <Stack.Screen name="IMC" component={Imc} />
+          <Stack.Screen name="glise" component={glice} />
+          <Stack.Screen name="pressao" component={pressao} />
         </>
       ) : (
         // Se o usuário NÃO ESTÁ logado, mostra apenas a tela de login
