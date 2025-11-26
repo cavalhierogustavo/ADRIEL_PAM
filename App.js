@@ -62,11 +62,11 @@ const AppNavigator = () => {
             headerRight: () => <LogoutButton />
           }}
         />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
-          <Stack.Screen name="Aguinha" component={aguinha} />
-          <Stack.Screen name="IMC" component={Imc} />
-          <Stack.Screen name="glise" component={glice} />
-          <Stack.Screen name="pressao" component={pressao} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Aguinha" component={aguinha} options={{ headerShown: false }} />
+          <Stack.Screen name="IMC" component={Imc} options={{ headerShown: false }} />
+          <Stack.Screen name="glise" component={glice} options={{ headerShown: false }} />
+          <Stack.Screen name="pressao" component={pressao} options={{ headerShown: false }} />
         </>
       ) : (
         // Se o usuário NÃO ESTÁ logado, mostra apenas a tela de login

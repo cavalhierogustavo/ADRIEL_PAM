@@ -189,8 +189,8 @@ voltarbtn:{
     elevation: 8,
   },
   quickAddImage: {
-    width: 40,
-    height: 40,
+    width: 58,
+    height: 58,
     marginBottom: 5,
   },
   quickAddText: {
