@@ -16,7 +16,9 @@ import HomeScreen from "./src/home/home"; // Supondo que 'aguinha' seja sua tela
 import aguinha from "./src/aguinha/aguinha"
 import cadastro from "./src/Cadastro/cadastro"
 import EditProfileScreen from './src/edição/EditProfileScreen';
-
+import imc from './src/Imc/imc';
+import Glicemia from './src/glicemia/glicemia';
+import Pressao from './src/pressao/pressao';
 const Stack = createNativeStackNavigator();
 
 const LogoutButton = () => {
@@ -60,6 +62,9 @@ const AppNavigator = () => {
           }}
         />
           <Stack.Screen name="Aguinha" component={aguinha} />
+          <Stack.Screen name="Imc" component={imc} />
+          <Stack.Screen name="Pressao" component={Pressao} />
+          <Stack.Screen name="glicemia" component={Glicemia} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
         </>
       ) : (

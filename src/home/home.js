@@ -21,7 +21,11 @@ import axios from 'axios';
 
 
 const localImages = { remedio: require("../../assets/copo.png"), /* ... */ };
-const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" }, /* ... */ ];
+const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" },
+  { id: "2", title: "Imc", img: localImages.remedio, screen: "Imc" },
+  { id: "3", title: "Glicemia", img: localImages.remedio, screen: "glicemia" },
+  { id: "4", title: "Pressão", img: localImages.remedio, screen: "Pressao" },
+];
 
 export default function Home() {
   const navigation = useNavigation();
