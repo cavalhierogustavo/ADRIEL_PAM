@@ -3,6 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Alert,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
 import { useNavigation } from '@react-navigation/native';
+
+// Ícones
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const { width, height } = Dimensions.get('window');
 
 function CalculadoraMetabolica() {
@@ -28,8 +34,8 @@ function CalculadoraMetabolica() {
       max: 18.4, 
       cor: '#7B1FA2',
       corBg: 'rgba(123, 31, 162, 0.12)',
-      emoji: '🐌',
-      emojiStatus: '⚠️',
+      icone: 'weight',
+      iconeStatus: 'alert-circle-outline',
       recomendacao: 'Considere aumentar atividade física gradual',
       descricao: 'IMC abaixo do ideal - procure orientação nutricional'
     },
@@ -41,8 +47,8 @@ function CalculadoraMetabolica() {
       max: 24.9, 
       cor: '#4CAF50',
       corBg: 'rgba(76, 175, 80, 0.12)',
-      emoji: '⚖️',
-      emojiStatus: '✅',
+      icone: 'scale-balance',
+      iconeStatus: 'check-circle',
       recomendacao: 'Excelente! Mantenha hábitos saudáveis',
       descricao: 'Parabéns! Seu peso está dentro do ideal'
     },
@@ -54,8 +60,8 @@ function CalculadoraMetabolica() {
       max: 29.9, 
       cor: '#FF9800',
       corBg: 'rgba(255, 152, 0, 0.12)',
-      emoji: '⚡',
-      emojiStatus: '⚠️',
+      icone: 'weight',
+      iconeStatus: 'alert-circle-outline',
       recomendacao: 'Considere ajustes na dieta e exercícios',
       descricao: 'Atenção: IMC acima do ideal'
     },
@@ -67,8 +73,8 @@ function CalculadoraMetabolica() {
       max: 34.9, 
       cor: '#F44336',
       corBg: 'rgba(244, 67, 54, 0.12)',
-      emoji: '🔥',
-      emojiStatus: '🚨',
+      icone: 'fire',
+      iconeStatus: 'alert-octagram',
       recomendacao: 'Consulte profissional para orientação',
       descricao: 'Atenção médica recomendada'
     },
@@ -80,8 +86,8 @@ function CalculadoraMetabolica() {
       max: 39.9, 
       cor: '#D32F2F',
       corBg: 'rgba(211, 47, 47, 0.12)',
-      emoji: '🚨',
-      emojiStatus: '⚠️',
+      icone: 'alert-octagram',
+      iconeStatus: 'alert-circle-outline',
       recomendacao: 'Acompanhamento médico recomendado',
       descricao: 'Acompanhamento médico essencial'
     },
@@ -93,8 +99,8 @@ function CalculadoraMetabolica() {
       max: 999, 
       cor: '#B71C1C',
       corBg: 'rgba(183, 28, 28, 0.12)',
-      emoji: '⛔',
-      emojiStatus: '🚨',
+      icone: 'alert-circle',
+      iconeStatus: 'alert-octagram',
       recomendacao: 'Buscar assistência médica urgente',
       descricao: 'Necessário acompanhamento médico urgente'
     }
@@ -221,13 +227,14 @@ function CalculadoraMetabolica() {
 
   const TelaPrincipal = () => (
     <ScrollView contentContainerStyle={styles.container}>
-<TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
-        </TouchableOpacity>
+      {/* BOTÃO VOLTAR — 100% PRESERVADO */}
+      <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
+        <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
+      </TouchableOpacity>
 
       <View style={styles.header}>
         <View style={styles.titleGroup}>
-          <Text style={styles.titleIcon}>🧬</Text>
+          <MaterialCommunityIcons name="dna" size={32} color="#0D47A1" />
           <Text style={styles.title}>Metabolismo</Text>
         </View>
         <Text style={styles.subtitle}>Índice Metabólico Corporal</Text>
@@ -238,10 +245,10 @@ function CalculadoraMetabolica() {
           <Text style={styles.cardHeaderText}>Calculadora</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity style={styles.secondaryButton} onPress={limparDados}>
-              <Text style={styles.secondaryButtonText}>🗑️</Text>
+              <MaterialCommunityIcons name="delete" size={18} color="#0D47A1" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.secondaryButton} onPress={() => setModalVisivel(true)}>
-              <Text style={styles.secondaryButtonText}>❓</Text>
+              <MaterialCommunityIcons name="help-circle" size={18} color="#0D47A1" />
             </TouchableOpacity>
           </View>
         </View>
@@ -255,6 +262,7 @@ function CalculadoraMetabolica() {
               value={peso}
               onChangeText={setPeso}
               style={styles.input}
+              inputMode="decimal"
             />
           </View>
 
@@ -266,6 +274,7 @@ function CalculadoraMetabolica() {
               value={altura}
               onChangeText={setAltura}
               style={styles.input}
+              inputMode="numeric"
             />
           </View>
 
@@ -274,15 +283,16 @@ function CalculadoraMetabolica() {
             style={[styles.primaryButton, (!peso || !altura) && styles.buttonDisabled]}
             disabled={!peso || !altura}
           >
-            <Text style={styles.primaryButtonText}>🔬 Analisar Metabolismo</Text>
+            <Text style={styles.primaryButtonText}>Analisar Metabolismo</Text>
           </TouchableOpacity>
 
           {imc > 0 && (
             <View style={[styles.resultBox, { borderColor: nivelSelecionado?.cor }]}>
-              {/* NOVO LAYOUT MELHORADO PARA O NÍVEL */}
               <View style={styles.levelContainer}>
                 <View style={styles.levelHeader}>
-                  <Text style={styles.levelEmojiMain}>{nivelSelecionado?.emojiStatus}</Text>
+                  <View style={styles.levelIconMain}>
+                    <MaterialCommunityIcons name={nivelSelecionado?.iconeStatus} size={24} color={nivelSelecionado?.cor} />
+                  </View>
                   <View style={styles.levelTextContainer}>
                     <Text style={[styles.levelNameMain, { color: nivelSelecionado?.cor }]}>
                       {nivelSelecionado?.nomeCompleto}
@@ -294,8 +304,9 @@ function CalculadoraMetabolica() {
                 </View>
                 
                 <View style={[styles.levelBadgeNew, { backgroundColor: nivelSelecionado?.corBg }]}>
+                  <FontAwesome5 name="lightbulb" size={12} color="#33691E" />
                   <Text style={styles.levelRecommendation}>
-                    💡 {nivelSelecionado?.recomendacao}
+                    {' '} {nivelSelecionado?.recomendacao}
                   </Text>
                 </View>
               </View>
@@ -313,7 +324,7 @@ function CalculadoraMetabolica() {
         style={styles.toggleSection}
         onPress={() => setMostrarHistorico(!mostrarHistorico)}
       >
-        <Text style={styles.toggleIcon}>{mostrarHistorico ? '🔼' : '🔽'}</Text>
+        <Ionicons name={mostrarHistorico ? "chevron-up" : "chevron-down"} size={16} color="#0D47A1" />
         <Text style={styles.toggleText}>
           Histórico de Análises ({historicoCalculos.length})
         </Text>
@@ -325,7 +336,7 @@ function CalculadoraMetabolica() {
       {mostrarHistorico && (
         <View style={styles.historySection}>
           <View style={styles.historyHeader}>
-            <Text style={styles.historyTitle}>📋 Registros Anteriores</Text>
+            <Text style={styles.historyTitle}>Registros Anteriores</Text>
             {historicoCalculos.length > 0 && (
               <TouchableOpacity onPress={limparHistorico}>
                 <Text style={styles.clearHistoryText}>Limpar</Text>
@@ -336,7 +347,7 @@ function CalculadoraMetabolica() {
           <View style={styles.historyCard}>
             {historicoCalculos.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>📊</Text>
+                <MaterialCommunityIcons name="chart-bar" size={24} color="#0D47A1" />
                 <Text style={styles.emptyText}>Nenhuma análise ainda</Text>
                 <Text style={styles.emptySubtext}>Comece calculando seu metabolismo!</Text>
               </View>
@@ -351,7 +362,7 @@ function CalculadoraMetabolica() {
                     >
                       <View style={styles.historyContent}>
                         <View style={styles.historyHeader}>
-                          <Text style={styles.historyEmoji}>{nivel?.emoji || '📊'}</Text>
+                          <MaterialCommunityIcons name={nivel?.icone || 'chart-bar'} size={18} color={nivel?.cor || '#455A64'} />
                           <View style={styles.historyMain}>
                             <Text style={styles.historyValue}>
                               IMC: {registro.imc} kg/m²
@@ -376,7 +387,7 @@ function CalculadoraMetabolica() {
       )}
 
       <View style={styles.levelsSection}>
-        <Text style={styles.levelsTitle}>📈 Classificação Metabólica</Text>
+        <Text style={styles.levelsTitle}>Classificação Metabólica</Text>
         <View style={styles.levelsGrid}>
           {niveisMetabolicos.map((nivel) => (
             <TouchableOpacity
@@ -391,10 +402,8 @@ function CalculadoraMetabolica() {
               onPress={() => setNivelSelecionado(nivel)}
             >
               <View style={styles.levelItemLeft}>
-                <Text style={styles.levelItemEmoji}>{nivel.emoji}</Text>
-                <Text style={[styles.levelItemEmojiStatus, { color: nivel.cor }]}>
-                  {nivel.emojiStatus}
-                </Text>
+                <MaterialCommunityIcons name={nivel.icone} size={20} color={nivel.cor} />
+                <MaterialCommunityIcons name={nivel.iconeStatus} size={12} color={nivel.cor} />
               </View>
               <View style={styles.levelItemContent}>
                 <Text style={[styles.levelItemName, { color: nivel.cor }]}>{nivel.nomeCompleto}</Text>
@@ -422,20 +431,23 @@ function CalculadoraMetabolica() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>🧬 Sobre o Metabolismo</Text>
+            <Text style={styles.modalTitle}>Sobre o Metabolismo</Text>
             <View style={styles.infoSection}>
+              <MaterialCommunityIcons name="water" size={16} color="#33691E" />
               <Text style={styles.infoText}>
-                💡 O Índice Metabólico Corporal (IMC) relaciona peso e altura para avaliar o metabolismo.
+                {' '}O Índice Metabólico Corporal (IMC) relaciona peso e altura para avaliar o metabolismo.
               </Text>
             </View>
             <View style={styles.infoSection}>
+              <FontAwesome5 name="calculator" size={16} color="#33691E" />
               <Text style={styles.infoText}>
-                🔬 Fórmula: IMC = peso ÷ (altura × altura)
+                {' '}Fórmula: IMC = peso ÷ (altura × altura)
               </Text>
             </View>
             <View style={styles.infoSection}>
+              <FontAwesome5 name="exclamation-triangle" size={16} color="#33691E" />
               <Text style={styles.infoText}>
-                ⚠️ Importante: Este é um indicador geral. Para avaliação completa, consulte um profissional de saúde.
+                {' '}Importante: Este é um indicador geral. Para avaliação completa, consulte um profissional de saúde.
               </Text>
             </View>
             <TouchableOpacity 
@@ -453,6 +465,7 @@ function CalculadoraMetabolica() {
   );
 }
 
+// Estilos (sem emojis, apenas ícones)
 const styles = StyleSheet.create({
  mainContainer: {
   flex: 1,
@@ -473,14 +486,11 @@ titleGroup: {
   justifyContent: 'center',
   marginBottom: 6,
 },
-titleIcon: {
-  fontSize: 32,
-  marginRight: 8,
-},
 title: {
   fontSize: 28,
   fontWeight: '700',
   color: '#0D47A1',
+  marginLeft: 8,
 },
 subtitle: {
   color: '#1976D2',
@@ -516,15 +526,13 @@ buttonGroup: {
 },
 secondaryButton: {
   backgroundColor: '#E3F2FD',
-  paddingHorizontal: 10,
-  paddingVertical: 6,
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: 36,
+  height: 36,
   borderRadius: 8,
   borderWidth: 1,
   borderColor: '#B0BEC5',
-},
-secondaryButtonText: {
-  fontSize: 16,
-  color: '#0D47A1',
 },
 formGroup: {
   padding: 16,
@@ -571,7 +579,6 @@ resultBox: {
   padding: 16,
   alignItems: 'center',
   borderWidth: 2,
-  borderColor: '#0077B6',
 },
 resultDisplay: {
   flexDirection: 'row',
@@ -589,7 +596,6 @@ resultUnit: {
   fontWeight: '500',
   color: '#1976D2',
 },
-// NOVOS ESTILOS PARA O NÍVEL MELHORADO
 levelContainer: {
   width: '100%',
   marginBottom: 16,
@@ -600,9 +606,10 @@ levelHeader: {
   marginBottom: 12,
   gap: 12,
 },
-levelEmojiMain: {
-  fontSize: 32,
-  textAlign: 'center',
+levelIconMain: {
+  justifyContent: 'center',
+  alignItems: 'center',
+  minWidth: 32,
 },
 levelTextContainer: {
   flex: 1,
@@ -622,30 +629,15 @@ levelBadgeNew: {
   paddingVertical: 8,
   borderRadius: 12,
   marginTop: 8,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 6,
 },
 levelRecommendation: {
   fontSize: 13,
   color: '#33691E',
   fontWeight: '500',
-  textAlign: 'center',
-},
-// ESTILOS ORIGINAIS (mantidos para compatibilidade)
-levelBadge: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  paddingHorizontal: 12,
-  paddingVertical: 8,
-  borderRadius: 20,
-  gap: 6,
-  backgroundColor: '#F1F8E9',
-},
-levelEmoji: {
-  fontSize: 18,
-},
-levelName: {
-  fontSize: 14,
-  fontWeight: '600',
-  color: '#33691E',
 },
 toggleSection: {
   flexDirection: 'row',
@@ -661,10 +653,6 @@ toggleSection: {
   shadowOpacity: 0.08,
   shadowRadius: 4,
   elevation: 3,
-},
-toggleIcon: {
-  fontSize: 16,
-  marginRight: 8,
 },
 toggleText: {
   flex: 1,
@@ -708,9 +696,6 @@ emptyState: {
   paddingVertical: 32,
   gap: 6,
 },
-emptyIcon: {
-  fontSize: 24,
-},
 emptyText: {
   fontSize: 16,
   color: '#455A64',
@@ -728,7 +713,6 @@ historyItem: {
   borderRadius: 10,
   marginBottom: 8,
   borderLeftWidth: 4,
-  borderLeftColor: '#0077B6',
 },
 historyContent: {
   gap: 4,
@@ -737,9 +721,6 @@ historyHeader: {
   flexDirection: 'row',
   alignItems: 'center',
   gap: 10,
-},
-historyEmoji: {
-  fontSize: 18,
 },
 historyMain: {
   flex: 1,
@@ -793,14 +774,7 @@ levelItem: {
 levelItemLeft: {
   alignItems: 'center',
   marginRight: 12,
-  gap: 2,
-},
-levelItemEmoji: {
-  fontSize: 20,
-},
-levelItemEmojiStatus: {
-  fontSize: 12,
-  fontWeight: 'bold',
+  gap: 4,
 },
 levelItemContent: {
   flex: 1,
@@ -849,6 +823,9 @@ infoSection: {
   borderLeftWidth: 4,
   padding: 14,
   borderRadius: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
 },
 infoText: {
   fontSize: 14,

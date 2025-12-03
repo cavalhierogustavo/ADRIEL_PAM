@@ -14,6 +14,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
 import { useNavigation } from '@react-navigation/native';
 
+// Ícones
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 const { width, height } = Dimensions.get('window');
 
 const AnalisadorGlicemico = () => {
@@ -71,7 +76,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Hipoglicemia Severa',
             cor: '#7B1FA2',
             recomendacao: 'Valor crítico baixo. Busque assistência médica imediatamente.',
-            icone: '🆘',
+            icone: 'alert-octagon', // 🆘
             gravidade: 'critica'
           };
         } else if (val >= 70 && val <= 99) {
@@ -79,7 +84,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Normal Ideal',
             cor: '#4CAF50',
             recomendacao: 'Excelente! Mantenha hábitos alimentares saudáveis.',
-            icone: '✅',
+            icone: 'check-circle', // ✅
             gravidade: 'ideal'
           };
         } else if (val >= 100 && val <= 125) {
@@ -87,7 +92,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Pré-diabetes',
             cor: '#FF9800',
             recomendacao: 'Consulte endocrinologista para avaliação detalhada.',
-            icone: '⚠️',
+            icone: 'exclamation-triangle', // ⚠️
             gravidade: 'atencao'
           };
         } else {
@@ -95,7 +100,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Diabetes Mellitus',
             cor: '#D32F2F',
             recomendacao: 'Acompanhamento médico urgente é necessário.',
-            icone: '🚨',
+            icone: 'ambulance', // 🚨
             gravidade: 'alerta'
           };
         }
@@ -106,7 +111,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Hipoglicemia',
             cor: '#7B1FA2',
             recomendacao: 'Valor baixo após refeição. Procure ajuda médica.',
-            icone: '🆘',
+            icone: 'alert-octagon',
             gravidade: 'critica'
           };
         } else if (val < 140) {
@@ -114,7 +119,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Normal',
             cor: '#4CAF50',
             recomendacao: 'Valores excelentes para pós-refeição.',
-            icone: '✅',
+            icone: 'check-circle',
             gravidade: 'ideal'
           };
         } else if (val >= 140 && val <= 199) {
@@ -122,7 +127,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Pré-diabetes',
             cor: '#FF9800',
             recomendacao: 'Controle alimentar é recomendado.',
-            icone: '⚠️',
+            icone: 'exclamation-triangle',
             gravidade: 'atencao'
           };
         } else {
@@ -130,7 +135,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Diabetes Mellitus',
             cor: '#D32F2F',
             recomendacao: 'Ajuste terapêutico pode ser necessário.',
-            icone: '🚨',
+            icone: 'ambulance',
             gravidade: 'alerta'
           };
         }
@@ -141,7 +146,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Hipoglicemia',
             cor: '#7B1FA2',
             recomendacao: 'Valor baixo. Consuma carboidrato antes da refeição.',
-            icone: '🆘',
+            icone: 'alert-octagon',
             gravidade: 'critica'
           };
         } else if (val >= 80 && val <= 130) {
@@ -149,7 +154,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Normal',
             cor: '#4CAF50',
             recomendacao: 'Valor ideal para início de refeição.',
-            icone: '✅',
+            icone: 'check-circle',
             gravidade: 'ideal'
           };
         } else if (val > 130 && val <= 180) {
@@ -157,7 +162,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Elevado',
             cor: '#FF9800',
             recomendacao: 'Considere ajuste alimentar antes da refeição.',
-            icone: '⚠️',
+            icone: 'exclamation-triangle',
             gravidade: 'atencao'
           };
         } else {
@@ -165,7 +170,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Muito Elevado',
             cor: '#D32F2F',
             recomendacao: 'Consulte médico urgentemente.',
-            icone: '🚨',
+            icone: 'ambulance',
             gravidade: 'alerta'
           };
         }
@@ -176,7 +181,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Hipoglicemia',
             cor: '#7B1FA2',
             recomendacao: 'Valor baixo. Pode causar desmaios.',
-            icone: '🆘',
+            icone: 'alert-octagon',
             gravidade: 'critica'
           };
         } else if (val < 140) {
@@ -184,7 +189,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Normal',
             cor: '#4CAF50',
             recomendacao: 'Valor dentro da faixa normal.',
-            icone: '✅',
+            icone: 'check-circle',
             gravidade: 'ideal'
           };
         } else if (val >= 140 && val <= 199) {
@@ -192,7 +197,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Elevado',
             cor: '#FF9800',
             recomendacao: 'Valor acima do normal.',
-            icone: '⚠️',
+            icone: 'exclamation-triangle',
             gravidade: 'atencao'
           };
         } else {
@@ -200,7 +205,7 @@ const AnalisadorGlicemico = () => {
             classificacao: 'Suspeito de Diabetes',
             cor: '#D32F2F',
             recomendacao: 'Triagem para diabetes necessária.',
-            icone: '🚨',
+            icone: 'medical-cross', // 🚨 alternativa
             gravidade: 'alerta'
           };
         }
@@ -276,7 +281,7 @@ const AnalisadorGlicemico = () => {
 
   return (
     <View style={styles.container}>
-
+      {/* Modal de Informações */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -285,20 +290,20 @@ const AnalisadorGlicemico = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>🧬 Sobre Glicemia</Text>
+            <Text style={styles.modalTitle}>Sobre Glicemia</Text>
             <View style={styles.infoSection}>
               <Text style={styles.infoText}>
-                💡 O nível de glicemia mede a quantidade de açúcar no sangue em mg/dL.
+                <MaterialCommunityIcons name="water" size={16} color="#33691E" />  O nível de glicemia mede a quantidade de açúcar no sangue em mg/dL.
               </Text>
             </View>
             <View style={styles.infoSection}>
               <Text style={styles.infoText}>
-                📊 Valores variam conforme o momento da medição (jejum, pós-refeição, etc.).
+                <MaterialCommunityIcons name="chart-line" size={16} color="#33691E" />  Valores variam conforme o momento da medição (jejum, pós-refeição, etc.).
               </Text>
             </View>
             <View style={styles.infoSection}>
               <Text style={styles.infoText}>
-                ⚠️ Importante: Para diagnóstico preciso, sempre consulte seu médico.
+                <FontAwesome5 name="exclamation-triangle" size={16} color="#33691E" />  Importante: Para diagnóstico preciso, sempre consulte seu médico.
               </Text>
             </View>
             <TouchableOpacity
@@ -312,31 +317,36 @@ const AnalisadorGlicemico = () => {
       </Modal>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
-                <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
-              </TouchableOpacity>
+        {/* Botão VOLTAR (mantido 100% igual) */}
+        <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
+          <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
+        </TouchableOpacity>
+
+        {/* Cabeçalho */}
         <View style={styles.header}>
           <View style={styles.titleGroup}>
-            <Text style={styles.titleIcon}>🩸</Text>
+            <MaterialCommunityIcons name="needle" size={32} color="#0D47A1" />
             <Text style={styles.title}>Glicemia Analyzer</Text>
           </View>
           <Text style={styles.subtitle}>Controle Metabólico Inteligente</Text>
         </View>
 
+        {/* Nova Análise */}
         <View style={styles.analysisCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardHeaderText}>Nova Análise</Text>
             <View style={styles.buttonGroup}>
               <TouchableOpacity style={styles.secondaryButton} onPress={limparDados}>
-                <Text style={styles.secondaryButtonText}>🗑️</Text>
+                <MaterialCommunityIcons name="delete" size={18} color="#0D47A1" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.secondaryButton} onPress={() => setModalVisivel(true)}>
-                <Text style={styles.secondaryButtonText}>❓</Text>
+                <MaterialCommunityIcons name="help-circle" size={18} color="#0D47A1" />
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.formGroup}>
+            {/* Input Glicemia */}
             <View style={styles.inputField}>
               <Text style={styles.label}>Glicemia (mg/dL)</Text>
               <TextInput
@@ -349,6 +359,7 @@ const AnalisadorGlicemico = () => {
               />
             </View>
 
+            {/* Modalidades */}
             <View style={styles.inputField}>
               <Text style={styles.label}>Modalidade de Medição</Text>
               <View style={styles.modalidadesContainer}>
@@ -378,18 +389,20 @@ const AnalisadorGlicemico = () => {
               </View>
             </View>
 
+            {/* Botão Analisar */}
             <TouchableOpacity 
               style={[styles.primaryButton, (!glicemia || !modalidade) && styles.buttonDisabled]}
               onPress={analisarGlicemia}
               disabled={!glicemia || !modalidade}
             >
-              <Text style={styles.primaryButtonText}>🔬 Analisar Glicemia</Text>
+              <Text style={styles.primaryButtonText}>Analisar Glicemia</Text>
             </TouchableOpacity>
 
+            {/* Resultado */}
             {resultado && (
               <View style={[styles.resultBox, { borderColor: resultado.cor }]}>
                 <View style={styles.resultHeader}>
-                  <Text style={styles.resultIcon}>{resultado.icone}</Text>
+                  <MaterialCommunityIcons name={resultado.icone} size={20} color={resultado.cor} />
                   <Text style={[styles.resultTitle, { color: resultado.cor }]}>
                     {resultado.classificacao}
                   </Text>
@@ -414,11 +427,12 @@ const AnalisadorGlicemico = () => {
           </View>
         </View>
 
+        {/* Toggle Histórico */}
         <TouchableOpacity 
           style={styles.toggleSection}
           onPress={() => setMostrarHistorico(!mostrarHistorico)}
         >
-          <Text style={styles.toggleIcon}>{mostrarHistorico ? '🔼' : '🔽'}</Text>
+          <Ionicons name={mostrarHistorico ? "chevron-up" : "chevron-down"} size={16} color="#0D47A1" />
           <Text style={styles.toggleText}>
             Histórico de Análises ({historicoGlicemia.length})
           </Text>
@@ -427,10 +441,11 @@ const AnalisadorGlicemico = () => {
           </Text>
         </TouchableOpacity>
 
+        {/* Histórico */}
         {mostrarHistorico && (
           <View style={styles.historySection}>
             <View style={styles.historyHeader}>
-              <Text style={styles.historyTitle}>📋 Registros Metabólicos</Text>
+              <Text style={styles.historyTitle}>Registros Metabólicos</Text>
               {historicoGlicemia.length > 0 && (
                 <TouchableOpacity onPress={limparHistorico}>
                   <Text style={styles.clearHistoryText}>Limpar</Text>
@@ -441,7 +456,7 @@ const AnalisadorGlicemico = () => {
             <View style={styles.historyCard}>
               {historicoGlicemia.length === 0 ? (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyIcon}>🩸</Text>
+                  <MaterialCommunityIcons name="needle" size={24} color="#0D47A1" />
                   <Text style={styles.emptyText}>Nenhuma análise ainda</Text>
                   <Text style={styles.emptySubtext}>Comece analisando sua glicemia!</Text>
                 </View>
@@ -449,10 +464,9 @@ const AnalisadorGlicemico = () => {
                 <ScrollView style={styles.historyList} showsVerticalScrollIndicator={false}>
                   {historicoGlicemia.map((item) => (
                     <View key={item.id} style={[styles.historyItem, { borderLeftColor: item.cor }]}>
-                      <View style={styles.historyIndicator} />
                       <View style={styles.historyContent}>
                         <View style={styles.historyHeader}>
-                          <Text style={styles.historyEmoji}>{item.icone}</Text>
+                          <MaterialCommunityIcons name={item.icone} size={16} color={item.cor} />
                           <View style={styles.historyMain}>
                             <Text style={styles.historyValue}>
                               {item.glicemia} mg/dL
@@ -473,12 +487,13 @@ const AnalisadorGlicemico = () => {
           </View>
         )}
 
+        {/* Valores de Referência */}
         <View style={styles.referenceSection}>
-          <Text style={styles.referenceTitle}>📊 Valores de Referência</Text>
+          <Text style={styles.referenceTitle}>Valores de Referência</Text>
           <View style={styles.referenceCard}>
             <View style={styles.referenceItem}>
               <View style={styles.referenceHeader}>
-                <Text style={styles.referenceIcon}>🏥</Text>
+                <MaterialCommunityIcons name="hospital-building" size={18} color="#0D47A1" />
                 <Text style={styles.referenceName}>Jejum</Text>
               </View>
               <View style={styles.referenceValues}>
@@ -490,7 +505,7 @@ const AnalisadorGlicemico = () => {
             
             <View style={styles.referenceItem}>
               <View style={styles.referenceHeader}>
-                <Text style={styles.referenceIcon}>🍽️</Text>
+                <MaterialCommunityIcons name="silverware-fork-knife" size={18} color="#0D47A1" />
                 <Text style={styles.referenceName}>Pós-refeição (2h)</Text>
               </View>
               <View style={styles.referenceValues}>
@@ -506,431 +521,407 @@ const AnalisadorGlicemico = () => {
   );
 };
 
+// Estilos (sem mudanças significativas, mas removidos emojis)
 const styles = StyleSheet.create({
   container: {
-  flex: 1,
-  backgroundColor: '#E3F2FD',
-},
-scrollView: {
-  flex: 1,
-  paddingHorizontal: 16,
-},
-header: {
-  alignItems: 'center',
-  paddingTop: 32,
-  paddingBottom: 20,
-  marginTop:19
-},
-titleGroup: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginBottom: 6,
-},
-titleIcon: {
-  fontSize: 32,
-  marginRight: 8,
-},
-title: {
-  fontSize: 28,
-  fontWeight: '700',
-  color: '#0D47A1',
-},
-subtitle: {
-  color: '#1976D2',
-  fontSize: 15,
-},
-analysisCard: {
-  backgroundColor: 'white',
-  borderRadius: 16,
-  shadowColor: '#0D47A1',
-  shadowOffset: { width: 0, height: 3 },
-  shadowOpacity: 0.1,
-  shadowRadius: 6,
-  elevation: 4,
-  marginBottom: 16,
-},
-cardHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  borderBottomWidth: 1,
-  borderBottomColor: '#E3F2FD',
-},
-cardHeaderText: {
-  fontSize: 18,
-  fontWeight: '600',
-  color: '#0D47A1',
-},
-buttonGroup: {
-  flexDirection: 'row',
-  gap: 8,
-},
-secondaryButton: {
-  backgroundColor: '#E3F2FD',
-  paddingHorizontal: 10,
-  paddingVertical: 6,
-  borderRadius: 8,
-  borderWidth: 1,
-  borderColor: '#B0BEC5',
-},
-secondaryButtonText: {
-  fontSize: 16,
-  color: '#0D47A1',
-},
-formGroup: {
-  padding: 16,
-  gap: 16,
-},
-inputField: {
-  gap: 6,
-},
-label: {
-  fontSize: 14,
-  fontWeight: '500',
-  color: '#0D47A1',
-},
-input: {
-  height: 52,
-  backgroundColor: '#F0F8FF',
-  borderWidth: 1,
-  borderColor: '#B0BEC5',
-  borderRadius: 10,
-  paddingHorizontal: 16,
-  fontSize: 16,
-  color: '#455A64',
-},
-modalidadesContainer: {
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  gap: 8,
-},
-modalidadeButton: {
-  paddingHorizontal: 14,
-  paddingVertical: 10,
-  backgroundColor: '#F0F8FF',
-  borderWidth: 1,
-  borderColor: '#B0BEC5',
-  borderRadius: 10,
-  flex: 1,
-  minWidth: '45%',
-  alignItems: 'center',
-},
-modalidadeButtonText: {
-  fontSize: 13,
-  fontWeight: '500',
-  color: '#0D47A1',
-  textAlign: 'center',
-},
-primaryButton: {
-  height: 52,
-  backgroundColor: '#0077B6',
-  borderRadius: 12,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: 8,
-},
-buttonDisabled: {
-  backgroundColor: '#B0BEC5',
-},
-primaryButtonText: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: 'white',
-},
-resultBox: {
-  backgroundColor: '#E3F2FD',
-  borderRadius: 14,
-  padding: 16,
-  borderWidth: 2,
-  borderColor: '#0077B6',
-},
-resultHeader: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 8,
-  gap: 8,
-},
-resultIcon: {
-  fontSize: 20,
-},
-resultTitle: {
-  fontSize: 18,
-  fontWeight: '600',
-  color: '#0D47A1',
-},
-glicemiaDisplay: {
-  flexDirection: 'row',
-  alignItems: 'baseline',
-  justifyContent: 'center',
-  marginVertical: 12,
-  gap: 4,
-},
-glicemiaValue: {
-  fontSize: 28,
-  fontWeight: '700',
-  color: '#0D47A1',
-},
-glicemiaUnit: {
-  fontSize: 14,
-  fontWeight: '500',
-  color: '#1976D2',
-},
-resultDescription: {
-  fontSize: 14,
-  color: '#0D47A1',
-  lineHeight: 20,
-  textAlign: 'center',
-  marginBottom: 8,
-},
-resultBadge: {
-  alignSelf: 'flex-start',
-  backgroundColor: '#E3F2FD',
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  borderRadius: 16,
-},
-resultType: {
-  fontSize: 12,
-  color: '#1976D2',
-  fontWeight: '500',
-},
-toggleSection: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: 'white',
-  paddingVertical: 14,
-  paddingHorizontal: 16,
-  marginBottom: 12,
-  borderRadius: 12,
-  shadowColor: '#0D47A1',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.08,
-  shadowRadius: 4,
-  elevation: 3,
-},
-toggleIcon: {
-  fontSize: 16,
-  marginRight: 8,
-},
-toggleText: {
-  flex: 1,
-  fontSize: 16,
-  fontWeight: '500',
-  color: '#0D47A1',
-  marginLeft: 8,
-},
-toggleAction: {
-  fontSize: 14,
-  color: '#1976D2',
-  fontWeight: '500',
-},
-historySection: {
-  marginBottom: 16,
-},
-historyHeader: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 8,
-  paddingHorizontal: 4,
-},
-historyTitle: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#0D47A1',
-},
-clearHistoryText: {
-  fontSize: 14,
-  color: '#F44336',
-  fontWeight: '500',
-},
-historyCard: {
-  backgroundColor: 'white',
-  borderRadius: 14,
-  padding: 16,
-},
-emptyState: {
-  alignItems: 'center',
-  paddingVertical: 32,
-  gap: 6,
-},
-emptyIcon: {
-  fontSize: 24,
-},
-emptyText: {
-  fontSize: 16,
-  color: '#455A64',
-},
-emptySubtext: {
-  fontSize: 13,
-  color: '#1976D2',
-},
-historyList: {
-  maxHeight: height * 0.4,
-},
-historyItem: {
-  flexDirection: 'row',
-  backgroundColor: '#E3F2FD',
-  padding: 12,
-  borderRadius: 10,
-  marginBottom: 8,
-  borderLeftWidth: 4,
-  borderLeftColor: '#0077B6',
-},
-historyIndicator: {
-  width: 0,
-},
-historyContent: {
-  flex: 1,
-  marginLeft: 4,
-},
-historyHeader: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 10,
-  marginBottom: 4,
-},
-historyEmoji: {
-  fontSize: 16,
-},
-historyMain: {
-  flex: 1,
-},
-historyValue: {
-  fontSize: 15,
-  fontWeight: '600',
-  color: '#0D47A1',
-},
-historyClassification: {
-  fontSize: 13,
-  fontWeight: '500',
-  marginTop: 1,
-  color: '#1976D2',
-},
-historyTime: {
-  fontSize: 11,
-  color: '#455A64',
-  fontWeight: '500',
-},
-historyType: {
-  fontSize: 12,
-  color: '#B0BEC5',
-  marginLeft: 26,
-},
-referenceSection: {
-  marginBottom: 24,
-},
-referenceTitle: {
-  fontSize: 18,
-  fontWeight: '600',
-  color: '#0D47A1',
-  textAlign: 'center',
-  marginBottom: 16,
-},
-referenceCard: {
-  backgroundColor: 'white',
-  borderRadius: 14,
-  padding: 16,
-},
-referenceItem: {
-  marginBottom: 16,
-},
-referenceHeader: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 8,
-  gap: 8,
-},
-referenceIcon: {
-  fontSize: 18,
-},
-referenceName: {
-  fontSize: 15,
-  fontWeight: '600',
-  color: '#0D47A1',
-},
-referenceValues: {
-  marginLeft: 26,
-  gap: 4,
-},
-referenceValue: {
-  fontSize: 13,
-  color: '#1976D2',
-},
-modalOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(13, 71, 161, 0.6)',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 20,
-},
-modalContent: {
-  backgroundColor: 'white',
-  borderRadius: 20,
-  padding: 24,
-  width: '100%',
-  maxWidth: 360,
-  gap: 16,
-},
-modalTitle: {
-  fontSize: 20,
-  fontWeight: '700',
-  color: '#0D47A1',
-  textAlign: 'center',
-  marginBottom: 8,
-},
-infoSection: {
-  backgroundColor: '#F1F8E9',
-  borderLeftColor: '#33691E',
-  borderLeftWidth: 4,
-  padding: 14,
-  borderRadius: 10,
-},
-infoText: {
-  fontSize: 14,
-  color: '#33691E',
-  lineHeight: 20,
-},
-modalButton: {
-  backgroundColor: '#0077B6',
-  borderRadius: 12,
-  paddingVertical: 14,
-  alignItems: 'center',
-  marginTop: 8,
-},
-modalButtonText: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: 'white',
-},
-voltarbtn:{
-  position: 'absolute',
-  top: 20,
-  left: 10,
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#FFFFFF',
-  borderRadius: 20,
-  paddingVertical: 10,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.1,
-  shadowRadius: 10,
-  elevation: 15,
-  zIndex:10,
-  width: 78,
-  height: 30,
-},
-
-voltarbtnTxt:{
-  fontSize: 14,
-  fontWeight: 'bold',
-  color: '#0D47A1',
-},
+    flex: 1,
+    backgroundColor: '#E3F2FD',
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  header: {
+    alignItems: 'center',
+    paddingTop: 32,
+    paddingBottom: 20,
+    marginTop: 19,
+  },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#0D47A1',
+    marginLeft: 8,
+  },
+  subtitle: {
+    color: '#1976D2',
+    fontSize: 15,
+  },
+  analysisCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    shadowColor: '#0D47A1',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    marginBottom: 16,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E3F2FD',
+  },
+  cardHeaderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0D47A1',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  secondaryButton: {
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#B0BEC5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 36,
+    height: 36,
+  },
+  formGroup: {
+    padding: 16,
+    gap: 16,
+  },
+  inputField: {
+    gap: 6,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#0D47A1',
+  },
+  input: {
+    height: 52,
+    backgroundColor: '#F0F8FF',
+    borderWidth: 1,
+    borderColor: '#B0BEC5',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#455A64',
+  },
+  modalidadesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  modalidadeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: '#F0F8FF',
+    borderWidth: 1,
+    borderColor: '#B0BEC5',
+    borderRadius: 10,
+    flex: 1,
+    minWidth: '45%',
+    alignItems: 'center',
+  },
+  modalidadeButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#0D47A1',
+    textAlign: 'center',
+  },
+  primaryButton: {
+    height: 52,
+    backgroundColor: '#0077B6',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#B0BEC5',
+  },
+  primaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+  },
+  resultBox: {
+    backgroundColor: '#E3F2FD',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 2,
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0D47A1',
+  },
+  glicemiaDisplay: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    marginVertical: 12,
+    gap: 4,
+  },
+  glicemiaValue: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#0D47A1',
+  },
+  glicemiaUnit: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1976D2',
+  },
+  resultDescription: {
+    fontSize: 14,
+    color: '#0D47A1',
+    lineHeight: 20,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  resultBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  resultType: {
+    fontSize: 12,
+    color: '#1976D2',
+    fontWeight: '500',
+  },
+  toggleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    shadowColor: '#0D47A1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  toggleText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#0D47A1',
+    marginLeft: 8,
+  },
+  toggleAction: {
+    fontSize: 14,
+    color: '#1976D2',
+    fontWeight: '500',
+  },
+  historySection: {
+    marginBottom: 16,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  historyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0D47A1',
+  },
+  clearHistoryText: {
+    fontSize: 14,
+    color: '#F44336',
+    fontWeight: '500',
+  },
+  historyCard: {
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    gap: 6,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#455A64',
+  },
+  emptySubtext: {
+    fontSize: 13,
+    color: '#1976D2',
+  },
+  historyList: {
+    maxHeight: height * 0.4,
+  },
+  historyItem: {
+    flexDirection: 'row',
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+  },
+  historyContent: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
+  },
+  historyMain: {
+    flex: 1,
+  },
+  historyValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#0D47A1',
+  },
+  historyClassification: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: 1,
+    color: '#1976D2',
+  },
+  historyTime: {
+    fontSize: 11,
+    color: '#455A64',
+    fontWeight: '500',
+  },
+  historyType: {
+    fontSize: 12,
+    color: '#B0BEC5',
+    marginLeft: 26,
+  },
+  referenceSection: {
+    marginBottom: 24,
+  },
+  referenceTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0D47A1',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  referenceCard: {
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+  },
+  referenceItem: {
+    marginBottom: 16,
+  },
+  referenceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  referenceName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#0D47A1',
+  },
+  referenceValues: {
+    marginLeft: 26,
+    gap: 4,
+  },
+  referenceValue: {
+    fontSize: 13,
+    color: '#1976D2',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(13, 71, 161, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 360,
+    gap: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0D47A1',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  infoSection: {
+    backgroundColor: '#F1F8E9',
+    borderLeftColor: '#33691E',
+    borderLeftWidth: 4,
+    padding: 14,
+    borderRadius: 10,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#33691E',
+    lineHeight: 20,
+  },
+  modalButton: {
+    backgroundColor: '#0077B6',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+  },
+  voltarbtn: {
+    position: 'absolute',
+    top: 20,
+    left: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 15,
+    zIndex: 10,
+    width: 78,
+    height: 30,
+  },
+  voltarbtnTxt: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0D47A1',
+  },
 });
 
 export default AnalisadorGlicemico;
