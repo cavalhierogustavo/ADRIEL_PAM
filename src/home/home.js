@@ -25,6 +25,8 @@ const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen
 { id: "2", title: "imc", img: localImages.remedio, screen: "IMC" },
 { id: "3", title: "glisemia", img: localImages.remedio, screen: "glise" },
 { id: "4", title: "pressao", img: localImages.remedio, screen: "pressao" },
+{ id: "4", title: "Dicas", img: localImages.remedio, screen: "dicas" },
+{ id: "4", title: "Frutas", img: localImages.remedio, screen: "Frutas" },
 ];
 
 export default function Home() {

@@ -19,6 +19,8 @@ import EditProfileScreen from './src/edição/EditProfileScreen';
 import Imc from './src/Imc/imc';
 import glice from './src/glicemia/glicemia';
 import pressao from './src/pressao/pressao';
+import Dicas from './src/dicas/dicas';
+import Frutas from './src/frutas/frutas';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +69,8 @@ const AppNavigator = () => {
           <Stack.Screen name="IMC" component={Imc} options={{ headerShown: false }} />
           <Stack.Screen name="glise" component={glice} options={{ headerShown: false }} />
           <Stack.Screen name="pressao" component={pressao} options={{ headerShown: false }} />
+          <Stack.Screen name="dicas" component={Dicas} options={{ headerShown: false }} />
+          <Stack.Screen name="Frutas" component={Frutas} options={{ headerShown: false }} />
         </>
       ) : (
         // Se o usuário NÃO ESTÁ logado, mostra apenas a tela de login
