@@ -20,13 +20,23 @@ import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'; // <-- IMPORTAR axios
 
 // Seus dados e imagens locais
-const localImages = { remedio: require("../../assets/copo.png"), /* ... */ };
-const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" }, /* ... */ 
-{ id: "2", title: "imc", img: localImages.remedio, screen: "IMC" },
-{ id: "3", title: "glisemia", img: localImages.remedio, screen: "glise" },
-{ id: "4", title: "pressao", img: localImages.remedio, screen: "pressao" },
-{ id: "4", title: "Dicas", img: localImages.remedio, screen: "dicas" },
-{ id: "4", title: "Frutas", img: localImages.remedio, screen: "Frutas" },
+const localImages = {
+  remedio: require("../../assets/water1.png"),
+  imc: require("../../assets/balanca.png"),
+  glicemia: require("../../assets/glicemia.png"),
+  pressao: require("../../assets/pressao.png"),
+  dicas: require("../../assets/dica.png"),
+  fruta: require("../../assets/fruta.png")
+};
+
+
+const data = [ 
+{ id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" }, /* ... */ 
+{ id: "2", title: "Imc", img: localImages.imc, screen: "IMC" },
+{ id: "3", title: "Glicemia", img: localImages.glicemia, screen: "glise" },
+{ id: "4", title: "Pressão", img: localImages.pressao, screen: "pressao" },
+{ id: "4", title: "Dicas", img: localImages.dicas, screen: "dicas" },
+{ id: "4", title: "Frutas", img: localImages.fruta, screen: "Frutas" },
 ];
 
 export default function Home() {
