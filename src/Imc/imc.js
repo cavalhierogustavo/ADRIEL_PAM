@@ -22,63 +22,81 @@ function CalculadoraMetabolica() {
   const niveisMetabolicos = [
     { 
       id: 'baixo', 
-      nome: 'Baixo Metabolismo', 
+      nome: 'Baixo Peso', 
+      nomeCompleto: 'Abaixo do Peso Normal',
       min: 0, 
       max: 18.4, 
       cor: '#7B1FA2',
       corBg: 'rgba(123, 31, 162, 0.12)',
       emoji: '🐌',
-      recomendacao: 'Considere aumentar atividade física gradual'
+      emojiStatus: '⚠️',
+      recomendacao: 'Considere aumentar atividade física gradual',
+      descricao: 'IMC abaixo do ideal - procure orientação nutricional'
     },
     { 
       id: 'normal-minimo', 
-      nome: 'Metabolismo Normal', 
+      nome: 'Peso Normal', 
+      nomeCompleto: 'Peso Normal',
       min: 18.5, 
       max: 24.9, 
       cor: '#4CAF50',
       corBg: 'rgba(76, 175, 80, 0.12)',
       emoji: '⚖️',
-      recomendacao: 'Excelente! Mantenha hábitos saudáveis'
+      emojiStatus: '✅',
+      recomendacao: 'Excelente! Mantenha hábitos saudáveis',
+      descricao: 'Parabéns! Seu peso está dentro do ideal'
     },
     { 
       id: 'moderado', 
-      nome: 'Metabolismo Moderado', 
+      nome: 'Sobrepeso', 
+      nomeCompleto: 'Sobrepeso',
       min: 25.0, 
       max: 29.9, 
       cor: '#FF9800',
       corBg: 'rgba(255, 152, 0, 0.12)',
       emoji: '⚡',
-      recomendacao: 'Considere ajustes na dieta e exercícios'
+      emojiStatus: '⚠️',
+      recomendacao: 'Considere ajustes na dieta e exercícios',
+      descricao: 'Atenção: IMC acima do ideal'
     },
     { 
       id: 'alto', 
-      nome: 'Metabolismo Alto', 
+      nome: 'Obesidade I', 
+      nomeCompleto: 'Obesidade Grau I',
       min: 30.0, 
       max: 34.9, 
       cor: '#F44336',
       corBg: 'rgba(244, 67, 54, 0.12)',
       emoji: '🔥',
-      recomendacao: 'Consulte profissional para orientação'
+      emojiStatus: '🚨',
+      recomendacao: 'Consulte profissional para orientação',
+      descricao: 'Atenção médica recomendada'
     },
     { 
       id: 'muito-alto', 
-      nome: 'Metabolismo Muito Alto', 
+      nome: 'Obesidade II', 
+      nomeCompleto: 'Obesidade Grau II',
       min: 35.0, 
       max: 39.9, 
       cor: '#D32F2F',
       corBg: 'rgba(211, 47, 47, 0.12)',
       emoji: '🚨',
-      recomendacao: 'Acompanhamento médico recomendado'
+      emojiStatus: '⚠️',
+      recomendacao: 'Acompanhamento médico recomendado',
+      descricao: 'Acompanhamento médico essencial'
     },
     { 
       id: 'critico', 
-      nome: 'Nível Crítico', 
+      nome: 'Obesidade III', 
+      nomeCompleto: 'Obesidade Grau III (Mórbida)',
       min: 40.0, 
       max: 999, 
       cor: '#B71C1C',
       corBg: 'rgba(183, 28, 28, 0.12)',
-      emoji: '⚠️',
-      recomendacao: 'Buscar assistência médica urgente'
+      emoji: '⛔',
+      emojiStatus: '🚨',
+      recomendacao: 'Buscar assistência médica urgente',
+      descricao: 'Necessário acompanhamento médico urgente'
     }
   ];
 
@@ -261,13 +279,30 @@ function CalculadoraMetabolica() {
 
           {imc > 0 && (
             <View style={[styles.resultBox, { borderColor: nivelSelecionado?.cor }]}>
+              {/* NOVO LAYOUT MELHORADO PARA O NÍVEL */}
+              <View style={styles.levelContainer}>
+                <View style={styles.levelHeader}>
+                  <Text style={styles.levelEmojiMain}>{nivelSelecionado?.emojiStatus}</Text>
+                  <View style={styles.levelTextContainer}>
+                    <Text style={[styles.levelNameMain, { color: nivelSelecionado?.cor }]}>
+                      {nivelSelecionado?.nomeCompleto}
+                    </Text>
+                    <Text style={styles.levelSubtitle}>
+                      {nivelSelecionado?.descricao}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={[styles.levelBadgeNew, { backgroundColor: nivelSelecionado?.corBg }]}>
+                  <Text style={styles.levelRecommendation}>
+                    💡 {nivelSelecionado?.recomendacao}
+                  </Text>
+                </View>
+              </View>
+
               <View style={styles.resultDisplay}>
                 <Text style={[styles.resultValue, { color: nivelSelecionado?.cor }]}>{imc}</Text>
                 <Text style={styles.resultUnit}>kg/m²</Text>
-              </View>
-              <View style={[styles.levelBadge, { backgroundColor: nivelSelecionado?.corBg }]}>
-                <Text style={[styles.levelEmoji]}>{nivelSelecionado?.emoji}</Text>
-                <Text style={[styles.levelName, { color: nivelSelecionado?.cor }]}>{nivel}</Text>
               </View>
             </View>
           )}
@@ -355,11 +390,19 @@ function CalculadoraMetabolica() {
               ]}
               onPress={() => setNivelSelecionado(nivel)}
             >
-              <Text style={styles.levelItemEmoji}>{nivel.emoji}</Text>
+              <View style={styles.levelItemLeft}>
+                <Text style={styles.levelItemEmoji}>{nivel.emoji}</Text>
+                <Text style={[styles.levelItemEmojiStatus, { color: nivel.cor }]}>
+                  {nivel.emojiStatus}
+                </Text>
+              </View>
               <View style={styles.levelItemContent}>
-                <Text style={[styles.levelItemName, { color: nivel.cor }]}>{nivel.nome}</Text>
+                <Text style={[styles.levelItemName, { color: nivel.cor }]}>{nivel.nomeCompleto}</Text>
                 <Text style={styles.levelItemRange}>
                   {nivel.max >= 999 ? `${nivel.min}+` : `${nivel.min} - ${nivel.max}`}
+                </Text>
+                <Text style={styles.levelItemDesc}>
+                  {nivel.descricao}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -546,6 +589,47 @@ resultUnit: {
   fontWeight: '500',
   color: '#1976D2',
 },
+// NOVOS ESTILOS PARA O NÍVEL MELHORADO
+levelContainer: {
+  width: '100%',
+  marginBottom: 16,
+},
+levelHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+  gap: 12,
+},
+levelEmojiMain: {
+  fontSize: 32,
+  textAlign: 'center',
+},
+levelTextContainer: {
+  flex: 1,
+},
+levelNameMain: {
+  fontSize: 18,
+  fontWeight: '700',
+  marginBottom: 2,
+},
+levelSubtitle: {
+  fontSize: 14,
+  color: '#455A64',
+  lineHeight: 18,
+},
+levelBadgeNew: {
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  borderRadius: 12,
+  marginTop: 8,
+},
+levelRecommendation: {
+  fontSize: 13,
+  color: '#33691E',
+  fontWeight: '500',
+  textAlign: 'center',
+},
+// ESTILOS ORIGINAIS (mantidos para compatibilidade)
 levelBadge: {
   flexDirection: 'row',
   alignItems: 'center',
@@ -706,9 +790,17 @@ levelItem: {
   borderWidth: 2,
   borderColor: 'transparent',
 },
+levelItemLeft: {
+  alignItems: 'center',
+  marginRight: 12,
+  gap: 2,
+},
 levelItemEmoji: {
   fontSize: 20,
-  marginRight: 12,
+},
+levelItemEmojiStatus: {
+  fontSize: 12,
+  fontWeight: 'bold',
 },
 levelItemContent: {
   flex: 1,
@@ -717,11 +809,17 @@ levelItemName: {
   fontSize: 15,
   fontWeight: '600',
   color: '#0D47A1',
+  marginBottom: 2,
 },
 levelItemRange: {
   fontSize: 13,
   color: '#1976D2',
-  marginTop: 2,
+  marginBottom: 2,
+},
+levelItemDesc: {
+  fontSize: 11,
+  color: '#455A64',
+  lineHeight: 14,
 },
 modalOverlay: {
   flex: 1,
