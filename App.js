@@ -19,6 +19,8 @@ import EditProfileScreen from './src/edição/EditProfileScreen';
 import imc from './src/Imc/imc';
 import Glicemia from './src/glicemia/glicemia';
 import Pressao from './src/pressao/pressao';
+import Alergias from './src/Alergias/alergias';
+import Vacinas from './src/vacinas/vacinas';
 const Stack = createNativeStackNavigator();
 
 const LogoutButton = () => {
@@ -65,6 +67,8 @@ const AppNavigator = () => {
           <Stack.Screen name="Imc" component={imc} />
           <Stack.Screen name="Pressao" component={Pressao} />
           <Stack.Screen name="glicemia" component={Glicemia} />
+          <Stack.Screen name="alergia" component={Alergias} />
+          <Stack.Screen name="vacinas" component={Vacinas} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Editar Perfil' }} />
         </>
       ) : (
