@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const AnalisadorGlicemico = () => {
+  const navigation = useNavigation();
   const [glicemia, setGlicemia] = useState('');
   const [modalidade, setModalidade] = useState('');
   const [resultado, setResultado] = useState(null);
@@ -274,6 +276,7 @@ const AnalisadorGlicemico = () => {
 
   return (
     <View style={styles.container}>
+
       <Modal
         animationType="fade"
         transparent={true}
@@ -309,6 +312,9 @@ const AnalisadorGlicemico = () => {
       </Modal>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+              <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
+                <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
+              </TouchableOpacity>
         <View style={styles.header}>
           <View style={styles.titleGroup}>
             <Text style={styles.titleIcon}>🩸</Text>
@@ -502,398 +508,429 @@ const AnalisadorGlicemico = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f3ff',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 20,
-  },
-  titleGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  titleIcon: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#4A148C',
-  },
-  subtitle: {
-    color: '#7B1FA2',
-    fontSize: 15,
-  },
-  analysisCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e8e3f0',
-  },
-  cardHeaderText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  secondaryButton: {
-    backgroundColor: '#f3edf9',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1d5e8',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-  },
-  formGroup: {
-    padding: 16,
-    gap: 16,
-  },
-  inputField: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4A148C',
-  },
-  input: {
-    height: 52,
-    backgroundColor: '#fbf9fc',
-    borderWidth: 1,
-    borderColor: '#d3b9e3',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    color: '#2d1b4e',
-  },
-  modalidadesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  modalidadeButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: '#fbf9fc',
-    borderWidth: 1,
-    borderColor: '#d3b9e3',
-    borderRadius: 10,
-    flex: 1,
-    minWidth: '45%',
-    alignItems: 'center',
-  },
-  modalidadeButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#4A148C',
-    textAlign: 'center',
-  },
-  primaryButton: {
-    height: 52,
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: '#b39ddb',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-  resultBox: {
-    backgroundColor: '#f9f5fd',
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 2,
-  },
-  resultHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  resultIcon: {
-    fontSize: 20,
-  },
-  resultTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  glicemiaDisplay: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    marginVertical: 12,
-    gap: 4,
-  },
-  glicemiaValue: {
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  glicemiaUnit: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#7B1FA2',
-  },
-  resultDescription: {
-    fontSize: 14,
-    color: '#4A148C',
-    lineHeight: 20,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  resultBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#f3edf9',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  resultType: {
-    fontSize: 12,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  toggleSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  toggleIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  toggleText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A148C',
-    marginLeft: 8,
-  },
-  toggleAction: {
-    fontSize: 14,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historySection: {
-    marginBottom: 16,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-    paddingHorizontal: 4,
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  clearHistoryText: {
-    fontSize: 14,
-    color: '#D32F2F',
-    fontWeight: '500',
-  },
-  historyCard: {
-    backgroundColor: 'white',
-    borderRadius: 14,
-    padding: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    gap: 6,
-  },
-  emptyIcon: {
-    fontSize: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#5e4b7a',
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: '#7B1FA2',
-  },
-  historyList: {
-    maxHeight: height * 0.4,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    backgroundColor: '#f8f3ff',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 8,
-    borderLeftWidth: 4,
-  },
-  historyIndicator: {
-    width: 0,
-  },
-  historyContent: {
-    flex: 1,
-    marginLeft: 4,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 4,
-  },
-  historyEmoji: {
-    fontSize: 16,
-  },
-  historyMain: {
-    flex: 1,
-  },
-  historyValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  historyClassification: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginTop: 1,
-  },
-  historyTime: {
-    fontSize: 11,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historyType: {
-    fontSize: 12,
-    color: '#6a5a83',
-    marginLeft: 26,
-  },
-  referenceSection: {
-    marginBottom: 24,
-  },
-  referenceTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  referenceCard: {
-    backgroundColor: 'white',
-    borderRadius: 14,
-    padding: 16,
-  },
-  referenceItem: {
-    marginBottom: 16,
-  },
-  referenceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  referenceIcon: {
-    fontSize: 18,
-  },
-  referenceName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  referenceValues: {
-    marginLeft: 26,
-    gap: 4,
-  },
-  referenceValue: {
-    fontSize: 13,
-    color: '#7B1FA2',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(74, 20, 140, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 360,
-    gap: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  infoSection: {
-    backgroundColor: '#f8f3ff',
-    borderLeftColor: '#7B1FA2',
-    borderLeftWidth: 4,
-    padding: 14,
-    borderRadius: 10,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#4A148C',
-    lineHeight: 20,
-  },
-  modalButton: {
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
+  flex: 1,
+  backgroundColor: '#E3F2FD',
+},
+scrollView: {
+  flex: 1,
+  paddingHorizontal: 16,
+},
+header: {
+  alignItems: 'center',
+  paddingTop: 32,
+  paddingBottom: 20,
+  marginTop:19
+},
+titleGroup: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 6,
+},
+titleIcon: {
+  fontSize: 32,
+  marginRight: 8,
+},
+title: {
+  fontSize: 28,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+subtitle: {
+  color: '#1976D2',
+  fontSize: 15,
+},
+analysisCard: {
+  backgroundColor: 'white',
+  borderRadius: 16,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 4,
+  marginBottom: 16,
+},
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 14,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E3F2FD',
+},
+cardHeaderText: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+buttonGroup: {
+  flexDirection: 'row',
+  gap: 8,
+},
+secondaryButton: {
+  backgroundColor: '#E3F2FD',
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+},
+secondaryButtonText: {
+  fontSize: 16,
+  color: '#0D47A1',
+},
+formGroup: {
+  padding: 16,
+  gap: 16,
+},
+inputField: {
+  gap: 6,
+},
+label: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#0D47A1',
+},
+input: {
+  height: 52,
+  backgroundColor: '#F0F8FF',
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+  borderRadius: 10,
+  paddingHorizontal: 16,
+  fontSize: 16,
+  color: '#455A64',
+},
+modalidadesContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 8,
+},
+modalidadeButton: {
+  paddingHorizontal: 14,
+  paddingVertical: 10,
+  backgroundColor: '#F0F8FF',
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+  borderRadius: 10,
+  flex: 1,
+  minWidth: '45%',
+  alignItems: 'center',
+},
+modalidadeButtonText: {
+  fontSize: 13,
+  fontWeight: '500',
+  color: '#0D47A1',
+  textAlign: 'center',
+},
+primaryButton: {
+  height: 52,
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 8,
+},
+buttonDisabled: {
+  backgroundColor: '#B0BEC5',
+},
+primaryButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+resultBox: {
+  backgroundColor: '#E3F2FD',
+  borderRadius: 14,
+  padding: 16,
+  borderWidth: 2,
+  borderColor: '#0077B6',
+},
+resultHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 8,
+  gap: 8,
+},
+resultIcon: {
+  fontSize: 20,
+},
+resultTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+glicemiaDisplay: {
+  flexDirection: 'row',
+  alignItems: 'baseline',
+  justifyContent: 'center',
+  marginVertical: 12,
+  gap: 4,
+},
+glicemiaValue: {
+  fontSize: 28,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+glicemiaUnit: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#1976D2',
+},
+resultDescription: {
+  fontSize: 14,
+  color: '#0D47A1',
+  lineHeight: 20,
+  textAlign: 'center',
+  marginBottom: 8,
+},
+resultBadge: {
+  alignSelf: 'flex-start',
+  backgroundColor: '#E3F2FD',
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 16,
+},
+resultType: {
+  fontSize: 12,
+  color: '#1976D2',
+  fontWeight: '500',
+},
+toggleSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: 'white',
+  paddingVertical: 14,
+  paddingHorizontal: 16,
+  marginBottom: 12,
+  borderRadius: 12,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 3,
+},
+toggleIcon: {
+  fontSize: 16,
+  marginRight: 8,
+},
+toggleText: {
+  flex: 1,
+  fontSize: 16,
+  fontWeight: '500',
+  color: '#0D47A1',
+  marginLeft: 8,
+},
+toggleAction: {
+  fontSize: 14,
+  color: '#1976D2',
+  fontWeight: '500',
+},
+historySection: {
+  marginBottom: 16,
+},
+historyHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+  paddingHorizontal: 4,
+},
+historyTitle: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+clearHistoryText: {
+  fontSize: 14,
+  color: '#F44336',
+  fontWeight: '500',
+},
+historyCard: {
+  backgroundColor: 'white',
+  borderRadius: 14,
+  padding: 16,
+},
+emptyState: {
+  alignItems: 'center',
+  paddingVertical: 32,
+  gap: 6,
+},
+emptyIcon: {
+  fontSize: 24,
+},
+emptyText: {
+  fontSize: 16,
+  color: '#455A64',
+},
+emptySubtext: {
+  fontSize: 13,
+  color: '#1976D2',
+},
+historyList: {
+  maxHeight: height * 0.4,
+},
+historyItem: {
+  flexDirection: 'row',
+  backgroundColor: '#E3F2FD',
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 8,
+  borderLeftWidth: 4,
+  borderLeftColor: '#0077B6',
+},
+historyIndicator: {
+  width: 0,
+},
+historyContent: {
+  flex: 1,
+  marginLeft: 4,
+},
+historyHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+  marginBottom: 4,
+},
+historyEmoji: {
+  fontSize: 16,
+},
+historyMain: {
+  flex: 1,
+},
+historyValue: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+historyClassification: {
+  fontSize: 13,
+  fontWeight: '500',
+  marginTop: 1,
+  color: '#1976D2',
+},
+historyTime: {
+  fontSize: 11,
+  color: '#455A64',
+  fontWeight: '500',
+},
+historyType: {
+  fontSize: 12,
+  color: '#B0BEC5',
+  marginLeft: 26,
+},
+referenceSection: {
+  marginBottom: 24,
+},
+referenceTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 16,
+},
+referenceCard: {
+  backgroundColor: 'white',
+  borderRadius: 14,
+  padding: 16,
+},
+referenceItem: {
+  marginBottom: 16,
+},
+referenceHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 8,
+  gap: 8,
+},
+referenceIcon: {
+  fontSize: 18,
+},
+referenceName: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+referenceValues: {
+  marginLeft: 26,
+  gap: 4,
+},
+referenceValue: {
+  fontSize: 13,
+  color: '#1976D2',
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(13, 71, 161, 0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+},
+modalContent: {
+  backgroundColor: 'white',
+  borderRadius: 20,
+  padding: 24,
+  width: '100%',
+  maxWidth: 360,
+  gap: 16,
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 8,
+},
+infoSection: {
+  backgroundColor: '#F1F8E9',
+  borderLeftColor: '#33691E',
+  borderLeftWidth: 4,
+  padding: 14,
+  borderRadius: 10,
+},
+infoText: {
+  fontSize: 14,
+  color: '#33691E',
+  lineHeight: 20,
+},
+modalButton: {
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  paddingVertical: 14,
+  alignItems: 'center',
+  marginTop: 8,
+},
+modalButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+voltarbtn:{
+  position: 'absolute',
+  top: 20,
+  left: 10,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 20,
+  paddingVertical: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.1,
+  shadowRadius: 10,
+  elevation: 15,
+  zIndex:10,
+  width: 78,
+  height: 30,
+},
+
+voltarbtnTxt:{
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#0D47A1',
+},
 });
 
 export default AnalisadorGlicemico;

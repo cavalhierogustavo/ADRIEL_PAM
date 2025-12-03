@@ -2,12 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Dimensions, Alert, Modal, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
-
+import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 function CalculadoraMetabolica() {
   const { user } = useContext(AuthContext); 
-
+  const navigation = useNavigation();
   const [peso, setPeso] = useState('');
   const [altura, setAltura] = useState('');
   const [imc, setImc] = useState(0);
@@ -203,6 +203,10 @@ function CalculadoraMetabolica() {
 
   const TelaPrincipal = () => (
     <ScrollView contentContainerStyle={styles.container}>
+<TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
+          <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
+        </TouchableOpacity>
+
       <View style={styles.header}>
         <View style={styles.titleGroup}>
           <Text style={styles.titleIcon}>🧬</Text>
@@ -407,356 +411,388 @@ function CalculadoraMetabolica() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: '#f8f3ff',
-  },
-  container: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 20,
-  },
-  titleGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  titleIcon: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#4A148C',
-  },
-  subtitle: {
-    color: '#7B1FA2',
-    fontSize: 15,
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e8e3f0',
-  },
-  cardHeaderText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  secondaryButton: {
-    backgroundColor: '#f3edf9',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1d5e8',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-  },
-  formGroup: {
-    padding: 16,
-    gap: 16,
-  },
-  inputField: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4A148C',
-  },
-  input: {
-    width: '100%',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#d3b9e3',
-    borderRadius: 10,
-    fontSize: 16,
-    color: '#2d1b4e',
-    backgroundColor: '#fbf9fc',
-  },
-  primaryButton: {
-    width: '100%',
-    paddingVertical: 16,
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  buttonDisabled: {
-    backgroundColor: '#b39ddb',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-  resultBox: {
-    backgroundColor: '#f9f5fd',
-    borderRadius: 14,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-  },
-  resultDisplay: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-    marginBottom: 8,
-  },
-  resultValue: {
-    fontSize: 36,
-    fontWeight: '700',
-  },
-  resultUnit: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#7B1FA2',
-  },
-  levelBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-  },
-  levelEmoji: {
-    fontSize: 18,
-  },
-  levelName: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  toggleSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  toggleIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  toggleText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A148C',
-    marginLeft: 8,
-  },
-  toggleAction: {
-    fontSize: 14,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historySection: {
-    marginBottom: 16,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-    paddingHorizontal: 4,
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  clearHistoryText: {
-    fontSize: 14,
-    color: '#F44336',
-    fontWeight: '500',
-  },
-  historyCard: {
-    backgroundColor: 'white',
-    borderRadius: 14,
-    padding: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    gap: 6,
-  },
-  emptyIcon: {
-    fontSize: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#5e4b7a',
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: '#7B1FA2',
-  },
-  historyList: {
-    maxHeight: height * 0.35,
-  },
-  historyItem: {
-    backgroundColor: '#f8f3ff',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 8,
-    borderLeftWidth: 4,
-  },
-  historyContent: {
-    gap: 4,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  historyEmoji: {
-    fontSize: 18,
-  },
-  historyMain: {
-    flex: 1,
-  },
-  historyValue: {
-    fontWeight: '600',
-    fontSize: 15,
-    color: '#4A148C',
-  },
-  historyLevel: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginTop: 1,
-  },
-  historyTime: {
-    fontSize: 11,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historyDetails: {
-    fontSize: 12,
-    color: '#6a5a83',
-    marginLeft: 28,
-  },
-  levelsSection: {
-    marginBottom: 16,
-  },
-  levelsTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  levelsGrid: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
-  },
-  levelItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f3ff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  levelItemEmoji: {
-    fontSize: 20,
-    marginRight: 12,
-  },
-  levelItemContent: {
-    flex: 1,
-  },
-  levelItemName: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  levelItemRange: {
-    fontSize: 13,
-    color: '#7B1FA2',
-    marginTop: 2,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(74, 20, 140, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 360,
-    gap: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  infoSection: {
-    backgroundColor: '#f8f3ff',
-    borderLeftColor: '#7B1FA2',
-    borderLeftWidth: 4,
-    padding: 14,
-    borderRadius: 10,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#4A148C',
-    lineHeight: 20,
-  },
-  modalButton: {
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
+ mainContainer: {
+  flex: 1,
+  backgroundColor: '#E3F2FD',
+},
+container: {
+  paddingHorizontal: 16,
+  paddingBottom: 24,
+},
+header: {
+  alignItems: 'center',
+  paddingTop: 32,
+  paddingBottom: 20,
+},
+titleGroup: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 6,
+},
+titleIcon: {
+  fontSize: 32,
+  marginRight: 8,
+},
+title: {
+  fontSize: 28,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+subtitle: {
+  color: '#1976D2',
+  fontSize: 15,
+},
+card: {
+  backgroundColor: 'white',
+  borderRadius: 16,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 4,
+  marginBottom: 16,
+},
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 14,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E3F2FD',
+},
+cardHeaderText: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+buttonGroup: {
+  flexDirection: 'row',
+  gap: 8,
+},
+secondaryButton: {
+  backgroundColor: '#E3F2FD',
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+},
+secondaryButtonText: {
+  fontSize: 16,
+  color: '#0D47A1',
+},
+formGroup: {
+  padding: 16,
+  gap: 16,
+},
+inputField: {
+  gap: 6,
+},
+label: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#0D47A1',
+},
+input: {
+  width: '100%',
+  padding: 12,
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+  borderRadius: 10,
+  fontSize: 16,
+  color: '#455A64',
+  backgroundColor: '#F0F8FF',
+},
+primaryButton: {
+  width: '100%',
+  paddingVertical: 16,
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 4,
+},
+buttonDisabled: {
+  backgroundColor: '#B0BEC5',
+},
+primaryButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+resultBox: {
+  backgroundColor: '#E3F2FD',
+  borderRadius: 14,
+  padding: 16,
+  alignItems: 'center',
+  borderWidth: 2,
+  borderColor: '#0077B6',
+},
+resultDisplay: {
+  flexDirection: 'row',
+  alignItems: 'baseline',
+  gap: 6,
+  marginBottom: 8,
+},
+resultValue: {
+  fontSize: 36,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+resultUnit: {
+  fontSize: 16,
+  fontWeight: '500',
+  color: '#1976D2',
+},
+levelBadge: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 12,
+  paddingVertical: 8,
+  borderRadius: 20,
+  gap: 6,
+  backgroundColor: '#F1F8E9',
+},
+levelEmoji: {
+  fontSize: 18,
+},
+levelName: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#33691E',
+},
+toggleSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: 'white',
+  paddingVertical: 14,
+  paddingHorizontal: 16,
+  marginBottom: 12,
+  borderRadius: 12,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 3,
+},
+toggleIcon: {
+  fontSize: 16,
+  marginRight: 8,
+},
+toggleText: {
+  flex: 1,
+  fontSize: 16,
+  fontWeight: '500',
+  color: '#0D47A1',
+  marginLeft: 8,
+},
+toggleAction: {
+  fontSize: 14,
+  color: '#1976D2',
+  fontWeight: '500',
+},
+historySection: {
+  marginBottom: 16,
+},
+historyHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+  paddingHorizontal: 4,
+},
+historyTitle: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+clearHistoryText: {
+  fontSize: 14,
+  color: '#F44336',
+  fontWeight: '500',
+},
+historyCard: {
+  backgroundColor: 'white',
+  borderRadius: 14,
+  padding: 16,
+},
+emptyState: {
+  alignItems: 'center',
+  paddingVertical: 32,
+  gap: 6,
+},
+emptyIcon: {
+  fontSize: 24,
+},
+emptyText: {
+  fontSize: 16,
+  color: '#455A64',
+},
+emptySubtext: {
+  fontSize: 13,
+  color: '#1976D2',
+},
+historyList: {
+  maxHeight: height * 0.35,
+},
+historyItem: {
+  backgroundColor: '#E3F2FD',
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 8,
+  borderLeftWidth: 4,
+  borderLeftColor: '#0077B6',
+},
+historyContent: {
+  gap: 4,
+},
+historyHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+},
+historyEmoji: {
+  fontSize: 18,
+},
+historyMain: {
+  flex: 1,
+},
+historyValue: {
+  fontWeight: '600',
+  fontSize: 15,
+  color: '#0D47A1',
+},
+historyLevel: {
+  fontSize: 13,
+  fontWeight: '500',
+  marginTop: 1,
+  color: '#1976D2',
+},
+historyTime: {
+  fontSize: 11,
+  color: '#455A64',
+  fontWeight: '500',
+},
+historyDetails: {
+  fontSize: 12,
+  color: '#B0BEC5',
+  marginLeft: 28,
+},
+levelsSection: {
+  marginBottom: 16,
+},
+levelsTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 16,
+},
+levelsGrid: {
+  backgroundColor: 'white',
+  borderRadius: 16,
+  padding: 16,
+},
+levelItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#E3F2FD',
+  borderRadius: 12,
+  padding: 12,
+  marginBottom: 8,
+  borderWidth: 2,
+  borderColor: 'transparent',
+},
+levelItemEmoji: {
+  fontSize: 20,
+  marginRight: 12,
+},
+levelItemContent: {
+  flex: 1,
+},
+levelItemName: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+levelItemRange: {
+  fontSize: 13,
+  color: '#1976D2',
+  marginTop: 2,
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(13, 71, 161, 0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+},
+modalContent: {
+  backgroundColor: 'white',
+  borderRadius: 20,
+  padding: 24,
+  width: '100%',
+  maxWidth: 360,
+  gap: 16,
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 8,
+},
+infoSection: {
+  backgroundColor: '#F1F8E9',
+  borderLeftColor: '#33691E',
+  borderLeftWidth: 4,
+  padding: 14,
+  borderRadius: 10,
+},
+infoText: {
+  fontSize: 14,
+  color: '#33691E',
+  lineHeight: 20,
+},
+modalButton: {
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  paddingVertical: 14,
+  alignItems: 'center',
+  marginTop: 8,
+},
+modalButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+voltarbtn:{
+  position: 'absolute',
+  top: 20,
+  left: 10,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 20,
+  paddingVertical: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.1,
+  shadowRadius: 10,
+  elevation: 15,
+  zIndex:10,
+  width: 78,
+  height: 30,
+},
+
+voltarbtnTxt:{
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#0D47A1',
+},
 });
 
 export default CalculadoraMetabolica;

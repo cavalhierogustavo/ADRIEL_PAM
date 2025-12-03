@@ -13,12 +13,14 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../../context/AuthContext'; 
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 const MonitorCardiaco = () => {
   const [sistolica, setSistolica] = useState('');
   const [diastolica, setDiastolica] = useState('');
+  const navigation = useNavigation();
   const [pulso, setPulso] = useState('');
   const [resultado, setResultado] = useState(null);
   const [historicoPressao, setHistoricoPressao] = useState([]);
@@ -309,6 +311,9 @@ const MonitorCardiaco = () => {
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
       >
+          <TouchableOpacity style={styles.voltarbtn} onPress={() => navigation.goBack()}>
+                        <Text style={styles.voltarbtnTxt}> VOLTAR </Text>
+                      </TouchableOpacity>
         <View style={styles.header}>
           <View style={styles.titleGroup}>
             <Text style={styles.titleIcon}>💓</Text>
@@ -490,422 +495,464 @@ const MonitorCardiaco = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f3ff',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  header: {
-    alignItems: 'center',
-    paddingTop: 32,
-    paddingBottom: 20,
-  },
-  titleGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  titleIcon: {
-    fontSize: 32,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#4A148C',
-  },
-  subtitle: {
-    color: '#7B1FA2',
-    fontSize: 15,
-  },
-  monitorCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e8e3f0',
-  },
-  cardHeaderText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  secondaryButton: {
-    backgroundColor: '#f3edf9',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e1d5e8',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-  },
-  formGroup: {
-    padding: 16,
-    gap: 16,
-  },
-  inputField: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4A148C',
-  },
-  inputContainer: {
-    position: 'relative',
-  },
-  input: {
-    height: 52,
-    backgroundColor: '#fbf9fc',
-    borderWidth: 1,
-    borderColor: '#d3b9e3',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingRight: 50,
-    fontSize: 16,
-    color: '#2d1b4e',
-  },
-  inputIcon: {
-    position: 'absolute',
-    right: 16,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-  },
-  inputIconText: {
-    fontSize: 18,
-  },
-  primaryButton: {
-    height: 52,
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: '#b39ddb',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
-  resultBox: {
-    backgroundColor: '#f9f5fd',
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 2,
-    borderLeftWidth: 6,
-    marginTop: 16,
-  },
-  resultHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 10,
-  },
-  resultIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  resultIcon: {
-    fontSize: 20,
-  },
-  resultTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  pressaoDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 12,
-    gap: 8,
-  },
-  pressaoCard: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#f8f3ff',
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  pressaoSeparator: {
-    paddingHorizontal: 8,
-  },
-  pressaoSeparatorText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#7B1FA2',
-  },
-  pressaoLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#7B1FA2',
-    marginBottom: 4,
-  },
-  pressaoValue: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  pulsoBox: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#f8f3ff',
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    marginVertical: 12,
-  },
-  pulsoLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    color: '#7B1FA2',
-    marginBottom: 4,
-  },
-  pulsoValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  pulsoCategory: {
-    fontSize: 10,
-    fontWeight: '500',
-  },
-  resultRecommendation: {
-    fontSize: 14,
-    color: '#4A148C',
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  toggleSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    shadowColor: '#4A148C',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  toggleIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  toggleText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#4A148C',
-    marginLeft: 8,
-  },
-  toggleAction: {
-    fontSize: 14,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historySection: {
-    marginBottom: 16,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-    paddingHorizontal: 4,
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  clearHistoryText: {
-    fontSize: 14,
-    color: '#D32F2F',
-    fontWeight: '500',
-  },
-  historyCard: {
-    backgroundColor: 'white',
-    borderRadius: 14,
-    padding: 16,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    gap: 6,
-  },
-  emptyIcon: {
-    fontSize: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#5e4b7a',
-  },
-  emptySubtext: {
-    fontSize: 13,
-    color: '#7B1FA2',
-  },
-  historyList: {
-    maxHeight: height * 0.4,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    backgroundColor: '#f8f3ff',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 8,
-    borderLeftWidth: 4,
-  },
-  historyIndicator: {
-    width: 0,
-  },
-  historyContent: {
-    flex: 1,
-    marginLeft: 4,
-  },
-  historyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 4,
-  },
-  historyEmoji: {
-    fontSize: 16,
-  },
-  historyMain: {
-    flex: 1,
-  },
-  historyValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  historyClassification: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginTop: 1,
-  },
-  historyTime: {
-    fontSize: 11,
-    color: '#7B1FA2',
-    fontWeight: '500',
-  },
-  historyPulse: {
-    fontSize: 12,
-    marginLeft: 26,
-  },
-  referenceSection: {
-    marginBottom: 24,
-  },
-  referenceTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  referenceCard: {
-    backgroundColor: 'white',
-    borderRadius: 14,
-    padding: 16,
-  },
-  referenceItem: {
-    marginBottom: 16,
-  },
-  referenceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-    gap: 8,
-  },
-  referenceIcon: {
-    fontSize: 16,
-  },
-  referenceName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#4A148C',
-  },
-  referenceValue: {
-    fontSize: 13,
-    color: '#7B1FA2',
-    marginLeft: 24,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(74, 20, 140, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 360,
-    gap: 16,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#4A148C',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  infoSection: {
-    backgroundColor: '#f8f3ff',
-    borderLeftColor: '#7B1FA2',
-    borderLeftWidth: 4,
-    padding: 14,
-    borderRadius: 10,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#4A148C',
-    lineHeight: 20,
-  },
-  modalButton: {
-    backgroundColor: '#7B1FA2',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'white',
-  },
+  flex: 1,
+  backgroundColor: '#E3F2FD',
+},
+scrollView: {
+  flex: 1,
+  paddingHorizontal: 16,
+},
+header: {
+  marginTop:19,
+  alignItems: 'center',
+  paddingTop: 32,
+  paddingBottom: 20,
+},
+titleGroup: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 6,
+},
+titleIcon: {
+  fontSize: 32,
+  marginRight: 8,
+},
+title: {
+  fontSize: 28,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+subtitle: {
+  color: '#1976D2',
+  fontSize: 15,
+},
+monitorCard: {
+  backgroundColor: 'white',
+  borderRadius: 16,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 4,
+  marginBottom: 16,
+},
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 14,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E3F2FD',
+},
+cardHeaderText: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+buttonGroup: {
+  flexDirection: 'row',
+  gap: 8,
+},
+secondaryButton: {
+  backgroundColor: '#E3F2FD',
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+},
+secondaryButtonText: {
+  fontSize: 16,
+  color: '#0D47A1',
+},
+formGroup: {
+  padding: 16,
+  gap: 16,
+},
+inputField: {
+  gap: 6,
+},
+label: {
+  fontSize: 14,
+  fontWeight: '500',
+  color: '#0D47A1',
+},
+inputContainer: {
+  position: 'relative',
+},
+input: {
+  height: 52,
+  backgroundColor: '#F0F8FF',
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+  borderRadius: 10,
+  paddingHorizontal: 16,
+  paddingRight: 50,
+  fontSize: 16,
+  color: '#455A64',
+},
+inputIcon: {
+  position: 'absolute',
+  right: 16,
+  top: '50%',
+  transform: [{ translateY: -10 }],
+},
+inputIconText: {
+  fontSize: 18,
+  color: '#1976D2',
+},
+primaryButton: {
+  height: 52,
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 8,
+},
+buttonDisabled: {
+  backgroundColor: '#B0BEC5',
+},
+primaryButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+resultBox: {
+  backgroundColor: '#E3F2FD',
+  borderRadius: 14,
+  padding: 16,
+  borderWidth: 2,
+  borderLeftWidth: 6,
+  borderColor: '#0077B6',
+  borderLeftColor: '#0077B6',
+  marginTop: 16,
+},
+resultHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 12,
+  gap: 10,
+},
+resultIconContainer: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#E3F2FD',
+},
+resultIcon: {
+  fontSize: 20,
+  color: '#0D47A1',
+},
+resultTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+pressaoDisplay: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginVertical: 12,
+  gap: 8,
+},
+pressaoCard: {
+  flex: 1,
+  paddingVertical: 12,
+  paddingHorizontal: 16,
+  backgroundColor: '#F0F8FF',
+  borderRadius: 12,
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+},
+pressaoSeparator: {
+  paddingHorizontal: 8,
+},
+pressaoSeparatorText: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#1976D2',
+},
+pressaoLabel: {
+  fontSize: 11,
+  fontWeight: '500',
+  color: '#1976D2',
+  marginBottom: 4,
+},
+pressaoValue: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#0D47A1',
+},
+pulsoBox: {
+  paddingVertical: 12,
+  paddingHorizontal: 16,
+  backgroundColor: '#F0F8FF',
+  borderRadius: 12,
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#B0BEC5',
+  marginVertical: 12,
+},
+pulsoLabel: {
+  fontSize: 11,
+  fontWeight: '500',
+  color: '#1976D2',
+  marginBottom: 4,
+},
+pulsoValue: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#0D47A1',
+  marginBottom: 2,
+},
+pulsoCategory: {
+  fontSize: 10,
+  fontWeight: '500',
+  color: '#1976D2',
+},
+resultRecommendation: {
+  fontSize: 14,
+  color: '#0D47A1',
+  lineHeight: 20,
+  textAlign: 'center',
+},
+toggleSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: 'white',
+  paddingVertical: 14,
+  paddingHorizontal: 16,
+  marginBottom: 12,
+  borderRadius: 12,
+  shadowColor: '#0D47A1',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 3,
+},
+toggleIcon: {
+  fontSize: 16,
+  marginRight: 8,
+},
+toggleText: {
+  flex: 1,
+  fontSize: 16,
+  fontWeight: '500',
+  color: '#0D47A1',
+  marginLeft: 8,
+},
+toggleAction: {
+  fontSize: 14,
+  color: '#1976D2',
+  fontWeight: '500',
+},
+historySection: {
+  marginBottom: 16,
+},
+historyHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+  paddingHorizontal: 4,
+},
+historyTitle: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+clearHistoryText: {
+  fontSize: 14,
+  color: '#F44336',
+  fontWeight: '500',
+},
+historyCard: {
+  backgroundColor: 'white',
+  borderRadius: 14,
+  padding: 16,
+},
+emptyState: {
+  alignItems: 'center',
+  paddingVertical: 32,
+  gap: 6,
+},
+emptyIcon: {
+  fontSize: 24,
+},
+emptyText: {
+  fontSize: 16,
+  color: '#455A64',
+},
+emptySubtext: {
+  fontSize: 13,
+  color: '#1976D2',
+},
+historyList: {
+  maxHeight: height * 0.4,
+},
+historyItem: {
+  flexDirection: 'row',
+  backgroundColor: '#E3F2FD',
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 8,
+  borderLeftWidth: 4,
+  borderLeftColor: '#0077B6',
+},
+historyIndicator: {
+  width: 0,
+},
+historyContent: {
+  flex: 1,
+  marginLeft: 4,
+},
+historyHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+  marginBottom: 4,
+},
+historyEmoji: {
+  fontSize: 16,
+},
+historyMain: {
+  flex: 1,
+},
+historyValue: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+historyClassification: {
+  fontSize: 13,
+  fontWeight: '500',
+  marginTop: 1,
+  color: '#1976D2',
+},
+historyTime: {
+  fontSize: 11,
+  color: '#455A64',
+  fontWeight: '500',
+},
+historyPulse: {
+  fontSize: 12,
+  marginLeft: 26,
+  color: '#B0BEC5',
+},
+referenceSection: {
+  marginBottom: 24,
+},
+referenceTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 16,
+},
+referenceCard: {
+  backgroundColor: 'white',
+  borderRadius: 14,
+  padding: 16,
+},
+referenceItem: {
+  marginBottom: 16,
+},
+referenceHeader: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 6,
+  gap: 8,
+},
+referenceIcon: {
+  fontSize: 16,
+  color: '#1976D2',
+},
+referenceName: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#0D47A1',
+},
+referenceValue: {
+  fontSize: 13,
+  color: '#1976D2',
+  marginLeft: 24,
+},
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(13, 71, 161, 0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+},
+modalContent: {
+  backgroundColor: 'white',
+  borderRadius: 20,
+  padding: 24,
+  width: '100%',
+  maxWidth: 360,
+  gap: 16,
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#0D47A1',
+  textAlign: 'center',
+  marginBottom: 8,
+},
+infoSection: {
+  backgroundColor: '#F1F8E9',
+  borderLeftColor: '#33691E',
+  borderLeftWidth: 4,
+  padding: 14,
+  borderRadius: 10,
+},
+infoText: {
+  fontSize: 14,
+  color: '#33691E',
+  lineHeight: 20,
+},
+modalButton: {
+  backgroundColor: '#0077B6',
+  borderRadius: 12,
+  paddingVertical: 14,
+  alignItems: 'center',
+  marginTop: 8,
+},
+modalButtonText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: 'white',
+},
+voltarbtn:{
+  position: 'absolute',
+  top: 20,
+  left: 10,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 20,
+  paddingVertical: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.1,
+  shadowRadius: 10,
+  elevation: 15,
+  zIndex:10,
+  width: 78,
+  height: 30,
+},
+
+voltarbtnTxt:{
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#0D47A1',
+},
 });
 
 export default MonitorCardiaco;
