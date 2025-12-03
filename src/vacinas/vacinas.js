@@ -302,6 +302,9 @@ function VacinasComSelecao() {
 
   return (
     <View style={styles.container}>
+
+
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.title}>Calendário de Vacinação</Text>
       </View>
@@ -312,9 +315,8 @@ function VacinasComSelecao() {
           {categorias.map(renderCategoriaButton)}
         </View>
       </View>
-
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {calendarioAtual.map(renderPeriodo)}
+        
       </ScrollView>
 
       <Modal
@@ -368,7 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#1976D2',
-    paddingTop: 48,
+
   },
   backButton: {
     marginRight: 16,

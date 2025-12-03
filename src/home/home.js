@@ -20,13 +20,21 @@ import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios'; 
 
 
-const localImages = { remedio: require("../../assets/copo.png"), /* ... */ };
+const localImages = { remedio: require("../../assets/copo.png"), 
+imc: require("../../assets/imc.png"), 
+glicemia: require("../../assets/glicemia.png"), 
+pressao: require("../../assets/pressao.png"), 
+alergia: require("../../assets/alergia.png"), 
+vacinas: require("../../assets/vacina.png"), 
+
+
+};
 const data = [ { id: "1", title: "Hidrômetro", img: localImages.remedio, screen: "Aguinha" },
-  { id: "2", title: "Imc", img: localImages.remedio, screen: "Imc" },
-  { id: "3", title: "Glicemia", img: localImages.remedio, screen: "glicemia" },
-  { id: "4", title: "Pressão", img: localImages.remedio, screen: "Pressao" },
-  { id: "4", title: "Alergia", img: localImages.remedio, screen: "alergia" },
-  { id: "4", title: "Vacinas", img: localImages.remedio, screen: "vacinas" },
+  { id: "2", title: "Imc", img: localImages.imc, screen: "Imc" },
+  { id: "3", title: "Glicemia", img: localImages.glicemia, screen: "glicemia" },
+  { id: "4", title: "Pressão", img: localImages.pressao, screen: "Pressao" },
+  { id: "4", title: "Alergia", img: localImages.alergia, screen: "alergia" },
+  { id: "4", title: "Vacinas", img: localImages.vacinas, screen: "vacinas" },
 ];
 
 export default function Home() {
